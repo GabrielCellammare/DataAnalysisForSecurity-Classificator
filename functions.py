@@ -15,6 +15,7 @@ from sklearn.metrics import f1_score
 
 seed = 42
 np.random.seed(seed)
+goodMalware = "'Goodware - Malware'"
 
 
 def loadData(pathTrain):
@@ -127,7 +128,7 @@ def preBoxPlotAnalysisData(x, y, boxPlotDir):
         x.boxplot(column=col, by='Label')
         # Aggiungi titoli e label per gli assi, se necessario
         plt.title(f'Boxplot della colonna {col}')
-        plt.xlabel('Goodware - Malware')
+        plt.xlabel(goodMalware)
         plt.ylabel('Dati')
         file_name = os.path.join(
             boxPlotDir, f'boxplot_{col}.png')
@@ -183,11 +184,11 @@ def BoxPlotAnalysisDataMutualInfo(x, y, boxPlotDir, mutualInfo={}, n_print=10):
         for tupla in mutualInfo:
             for col in x.columns:
                 if (tupla[0] == col and tupla[1] != 0):  # capire se va 0 considerato o meno
-                    if (i < 10):
+                    if (i < n_print):
                         x.boxplot(column=col, by='Label')
                         # Aggiungi titoli e label per gli assi, se necessario
                         plt.title(f'Boxplot della colonna {col}')
-                        plt.xlabel('Goodware - Malware')
+                        plt.xlabel(goodMalware)
                         plt.ylabel('Dati')
                         file_name = os.path.join(
                             boxPlotDirMutualInfoFirst, f'boxplot_{col}.png')
@@ -199,18 +200,17 @@ def BoxPlotAnalysisDataMutualInfo(x, y, boxPlotDir, mutualInfo={}, n_print=10):
         x['Label'] = y['Label']
         for tupla in reversed(mutualInfo):
             for col in x.columns:
-                if (tupla[0] == col and tupla[1] != 0):
-                    if (i < 10):
-                        x.boxplot(column=col, by='Label')
-                        # Aggiungi titoli e label per gli assi, se necessario
-                        plt.title(f'Boxplot della colonna {col}')
-                        plt.xlabel('Goodware - Malware')
-                        plt.ylabel('Dati')
-                        file_name = os.path.join(
-                            boxPlotDirMutualInfoLast, f'boxplot_{col}.png')
-                        plt.savefig(file_name)
-                        plt.close()
-                        i += 1
+                if (tupla[0] == col and tupla[1] != 0 and i < n_print):
+                    x.boxplot(column=col, by='Label')
+                    # Aggiungi titoli e label per gli assi, se necessario
+                    plt.title(f'Boxplot della colonna {col}')
+                    plt.xlabel(goodMalware)
+                    plt.ylabel('Dati')
+                    file_name = os.path.join(
+                        boxPlotDirMutualInfoLast, f'boxplot_{col}.png')
+                    plt.savefig(file_name)
+                    plt.close()
+                    i += 1
 
 
 """
@@ -241,6 +241,11 @@ def pca(X):
     return pca, feature_names, pca.explained_variance_ratio_
 
 
+"""
+Applicazione del PCA tramite un oggetto pca 
+"""
+
+
 def applyPCA(X, pca, pcalist):
     # Trasforma il DataFrame utilizzando PCA
     transformed = pca.transform(X)
@@ -252,15 +257,18 @@ def applyPCA(X, pca, pcalist):
     return df_pca
 
 
+"Selezione di Alcune delle PC con un determinato threesold"
+
+
 def NumberOfTopPCSelect(explained_variance, threesold):
     n = 0
     i = 0
     if (explained_variance[i] < threesold):
-        sum = explained_variance[i]
+        sumVariance = explained_variance[i]
         n = n+1
         i = i+1
-        while (sum < threesold) and i < len(explained_variance):
-            sum = sum+explained_variance[i]
+        while (sumVariance < threesold) and i < len(explained_variance):
+            sumVariance = sumVariance+explained_variance[i]
             n = n+1
             i = i+1
         return n
@@ -310,8 +318,6 @@ def decisionTreeLearner(X, Y, c='gini'):
     print(f"Number of leaves: {clf.get_n_leaves()} ")
     # Return the number of leaves of the decision tree.)
     return clf
-
-# def showTree
 
 
 def showTree(clf, script_pathTreeFolder):
