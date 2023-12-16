@@ -342,34 +342,37 @@ def determineDecisionTreekFoldConfiguration(ListXTrain, ListYTrain, ListXTest, L
 
     for criteria in criterion:
         for thre in np.arange(min_t, max_t, step):
+            avg_fscore = 0
             fscores = []
             selectedFeatures = topFeatureSelect(rank, thre)
             if (len(selectedFeatures) > 0):
+                # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
                 for i in range(len(ListXTrain)):
                     x_train_feature_selected = ListXTrain[i].loc[:,
                                                                  selectedFeatures]
+                    x_test = ListXTest[i].loc[:, selectedFeatures]
                     clf = decisionTreeLearner(
                         x_train_feature_selected, ListYTrain[i], criteria)
 
-                    x_test = ListXTest[i].loc[:, selectedFeatures]
                     y_pred = clf.predict(x_test)
 
                     fscores.append(f1_score(ListYTest[i], y_pred))
 
-            avg_fscore = np.mean(fscores)
-            print(f"Average F1 score: '{avg_fscore}'")
-            if avg_fscore > best_fscore:
-                best_fscore = avg_fscore
-                best_criterion = criteria
-                best_TH = thre
-                bestN = selectedFeatures
-
-            if avg_fscore == best_fscore:
-                if (len(selectedFeatures) < len(bestN)):
+            if (len(fscores) > 1):
+                avg_fscore = np.mean(fscores)
+                print(f"Average F1 score: '{avg_fscore}'")
+                if avg_fscore > best_fscore:
                     best_fscore = avg_fscore
                     best_criterion = criteria
                     best_TH = thre
                     bestN = selectedFeatures
+
+                if avg_fscore == best_fscore:
+                    if (len(selectedFeatures) < len(bestN)):  # ??
+                        best_fscore = avg_fscore
+                        best_criterion = criteria
+                        best_TH = thre
+                        bestN = selectedFeatures
 
     return best_criterion, best_TH, bestN, best_fscore
 

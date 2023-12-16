@@ -38,6 +38,8 @@ print(labelCount, "\n")
 # Stampo un istogramma
 plotHistogram(labelCount, y)
 """
+
+
 """
 # boxPlotDir = script_path.parent / "BoxPlot"
 # preBoxPlotAnalysisData(x_cleaned, y, boxPlotDir)
@@ -93,9 +95,11 @@ print(f"X mutual_info: '{rank}'\n")
 
 minThreshold = 0
 max = 0.0
+
 for key in rank:
     if (key[1] >= max):
         max = key[1]
+
 print(f"Max mutual info = '{max}'")
 
 stepThreshold = 0.05
@@ -111,6 +115,7 @@ print('Feature Ranking by MI:\n',
 
 toplist = topFeatureSelect(rank, bestTH)
 DT = decisionTreeLearner(x_cleaned.loc[:, toplist], y, bestCriterion)
+
 
 """
 # Controllo i valori mancanti verificando se il count è <1200 e li salvo in una lista
