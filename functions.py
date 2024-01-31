@@ -1,14 +1,18 @@
 import os
 import pandas as pd
 from matplotlib import pyplot as plt
+from scipy import stats
 from sklearn.feature_selection import mutual_info_classif
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.model_selection import StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import tree
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import numpy as np
 from sklearn.metrics import f1_score
+import pickle
+from pathlib import Path
 
 
 """Funzione che legge il file csv e restituisce un dataframe"""
@@ -46,6 +50,7 @@ finisce di cliclare tutte le colonne, rimuove quelle presenti nella lista perch�
 
 
 def removeColumnsWithMinMaxEqual(x):
+    print("\nRemoving columns with min=max...\n")
     columns_to_remove = []  # Lista per definire i nomi delle colonne rimosse
 
     for col in x.columns:
@@ -57,8 +62,16 @@ def removeColumnsWithMinMaxEqual(x):
 
     x_cleaned = x.drop(columns=columns_to_remove)  # Rimuovi le colonne inutili
     # x drop accetta come parametro columns = ['Colonna A, B, C']
-
+    print("\nCompleted!\n")
     return x_cleaned, columns_to_remove
+
+
+def removeColumnsWithMinMaxEqualTest(x, columnsremoving):
+    print("\nRemoving columns with min=max in Test...\n")
+    x_cleaned = x.drop(columns=columnsremoving)  # Rimuovi le colonne inutili
+    # x drop accetta come parametro columns = ['Colonna A, B, C']
+    print("\nCompleted!\n")
+    return x_cleaned
 
 
 # Ritorna una series
@@ -114,11 +127,12 @@ Funzione che salva il box plot di ogni variabile indipendente rispetto alle clas
 """
 
 
-def preBoxPlotAnalysisData(x, y, boxPlotDir):
+def BoxPlotPreAnalysisData(x, y, boxPlotDir):
+    print("\nSaving Box Plot in 'BoxPlot' Folder...\n")
     # Ottieni la lista dei file nella cartella
     elenco_file = os.listdir(boxPlotDir)
 
-    # Itera attraverso la lista dei file e rimuovili
+    # Itera attraverso la lista dei file e rimuove i file
     for file in elenco_file:
         percorso_completo = os.path.join(boxPlotDir, file)
         os.remove(percorso_completo)
@@ -134,7 +148,50 @@ def preBoxPlotAnalysisData(x, y, boxPlotDir):
             boxPlotDir, f'boxplot_{col}.png')
         plt.savefig(file_name)
         plt.close()
+    print("\nCompleted\n")
 
+
+"""
+def BoxPlotPreAnalysisData1(x, y, boxPlotDir, overlapDir):
+    # Ottieni la lista dei file nella cartella
+    elenco_fileboxPlotDir = os.listdir(boxPlotDir)
+    elenco_fileoverlapDir = os.listdir(overlapDir)
+
+    # Itera attraverso la lista dei file e rimuove i file
+    for file in elenco_fileboxPlotDir:
+        percorso_completo = os.path.join(boxPlotDir, file)
+        os.remove(percorso_completo)
+
+    for file in elenco_fileoverlapDir:
+        percorso_completo = os.path.join(overlapDir, file)
+        os.remove(percorso_completo)
+
+    x['Label'] = y['Label']
+    for col in x.columns:
+        # Crea il box plot
+        box_plot = x.boxplot(column=col, by='Label')
+
+        # Calcola la distribuzione dei dati per ogni gruppo
+        group1 = x[x['Label'] == 0][col]
+        group2 = x[x['Label'] == 1][col]
+
+        # Esegui il test di Kolmogorov-Smirnov
+        ks_stat, p_value = stats.ks_2samp(group1, group2)
+
+        # Verifica se i box plot si sovrappongono
+        if p_value > 0.10:  # Soglia di significatività
+            # Se i box plot si sovrappongono, salva il box plot in overlapDir
+            file_name = os.path.join(overlapDir, f'boxplot_{col}.png')
+        else:
+            # Altrimenti, salva il box plot in boxPlotDir
+            file_name = os.path.join(boxPlotDir, f'boxplot_{col}.png')
+
+        plt.title(f'Boxplot della colonna {col}')
+        plt.xlabel('goodMalware')
+        plt.ylabel('Dati')
+        plt.savefig(file_name)
+        plt.close()
+"""
 
 """
 Funzione che calcola il mutal info e restituisce un dict contenente in sorted_x[0] il nome della colonna, e in sorted_x[1] il valore
@@ -144,11 +201,13 @@ del mutual info
 
 def mutualInfoRank(X, Y):
     print("Computing mutual info ranking...")
+    # Restituisce i nomi delle colonne
     independentList = list(X.columns.values)
     res = dict(zip
                (independentList,
                    mutual_info_classif
                    (X,  np.ravel(Y), discrete_features=False, random_state=seed)))
+    # La funzione zip accoppia ciascun nome di colonna con il corrispondente valore di informazione mutua, creando una serie di tuple.
 
     sorted_x = sorted(res.items(), key=lambda kv: kv[1], reverse=True)
 
@@ -162,7 +221,7 @@ def mutualInfoRank(X, Y):
 
 def BoxPlotAnalysisDataMutualInfo(x, y, boxPlotDir, mutualInfo={}, n_print=10):
     # Ottieni la lista dei file nella cartella
-
+    print("\nSaving Mutual info variables Box Plot in 'BoxPlotMutualInfo' Folder...\n")
     boxPlotDirMutualInfoFirst = boxPlotDir / "MoreSignificant"
     boxPlotDirMutualInfoLast = boxPlotDir / "LessSignificant"
 
@@ -211,6 +270,7 @@ def BoxPlotAnalysisDataMutualInfo(x, y, boxPlotDir, mutualInfo={}, n_print=10):
                     plt.savefig(file_name)
                     plt.close()
                     i += 1
+    print("\nCompleted!\n")
 
 
 """
@@ -230,6 +290,7 @@ def topFeatureSelect(rank, threesold):
 
 """
 Funzione che si occupa di istanziare un oggetto PCA per la selezione delle componenti principali 
+fit=calcola autovalori e autovettori, parametri utilizzati per trasformare i dati per il transform
 """
 
 
@@ -249,11 +310,12 @@ Applicazione del PCA tramite un oggetto pca
 def applyPCA(X, pca, pcalist):
     # Trasforma il DataFrame utilizzando PCA
     transformed = pca.transform(X)
+    print(transformed)
     # Crea un nuovo DataFrame con le componenti principali
-    # Deve essere la stessa?
     df_pca = pd.DataFrame(transformed, columns=pcalist)
     print(f"\npcalist: '{pcalist}'\n")
     print(f"\ntransformed: '{transformed}'\n", )
+    print(f"\nDataframePCA: '{df_pca}\n")
     return df_pca
 
 
@@ -308,7 +370,7 @@ def printFolds(list):
         print(f"Fold {i} " + str(list[i].shape) + "\n")
 
 
-def decisionTreeLearner(X, Y, c='gini'):
+def decisionTreeLearner(X, Y, c='entropy'):
     clf = DecisionTreeClassifier(criterion=c, random_state=seed)
     clf.min_samples_split = 500  # Numero minimo di esempi per mettere uno split
     # Tree_ dentro c'è l'albero addestrata
@@ -334,47 +396,164 @@ def showTree(clf, script_pathTreeFolder):
 
 def determineDecisionTreekFoldConfiguration(ListXTrain, ListYTrain, ListXTest, ListYTest, rank, min_t, max_t, step):
 
-    best_fscore = 0
-    best_criterion = None
-    best_TH = None
-    bestN = None
-    criterion = ['gini', 'entropy']
+    print("\nComputing best configuration...\n")
 
-    for criteria in criterion:
-        for thre in np.arange(min_t, max_t, step):
-            avg_fscore = 0
-            fscores = []
-            selectedFeatures = topFeatureSelect(rank, thre)
-            if (len(selectedFeatures) > 0):
-                # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
-                for i in range(len(ListXTrain)):
-                    x_train_feature_selected = ListXTrain[i].loc[:,
-                                                                 selectedFeatures]
-                    x_test = ListXTest[i].loc[:, selectedFeatures]
-                    clf = decisionTreeLearner(
-                        x_train_feature_selected, ListYTrain[i], criteria)
+    script_path = Path(__file__)
 
-                    y_pred = clf.predict(x_test)
+    # Crea il percorso completo al file utilizzando pathlib
+    serialize_dir = script_path.parent / "Serialized" / "BestConfiguration.pkl"
 
-                    fscores.append(f1_score(ListYTest[i], y_pred))
+    # Verifica se il file esiste
+    if os.path.exists(serialize_dir):
+        # Se il file esiste, leggi i parametri
+        with open(serialize_dir, "rb") as f:
+            bestConfiguration = pickle.load(f)
 
-            if (len(fscores) > 1):
-                avg_fscore = np.mean(fscores)
-                print(f"Average F1 score: '{avg_fscore}'")
-                if avg_fscore > best_fscore:
-                    best_fscore = avg_fscore
-                    best_criterion = criteria
-                    best_TH = thre
-                    bestN = selectedFeatures
+        best_criterion = bestConfiguration["best_criterion"]
+        best_TH = bestConfiguration["best_TH"]
+        bestN = bestConfiguration["bestN"]
+        best_fscore = bestConfiguration["best_fscore"]
 
-                if avg_fscore == best_fscore:
-                    if (len(selectedFeatures) < len(bestN)):  # ??
+        print("\nCompleted!\n")
+        return best_criterion, best_TH, bestN, best_fscore
+
+    else:
+
+        best_criterion = None
+        best_TH = None
+        bestN = None
+        best_fscore = 0
+
+        criterion = ['gini', 'entropy']
+
+        for criteria in criterion:
+            for thre in np.arange(min_t, max_t, step):
+                avg_fscore = 0
+                fscores = []
+                selectedFeatures = topFeatureSelect(rank, thre)
+                if (len(selectedFeatures) > 0):
+                    # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
+                    for i in range(len(ListXTrain)):
+                        x_train_feature_selected = ListXTrain[i].loc[:,
+                                                                     selectedFeatures]
+                        x_test = ListXTest[i].loc[:, selectedFeatures]
+                        clf = decisionTreeLearner(
+                            x_train_feature_selected, ListYTrain[i], criteria)
+
+                        y_pred = clf.predict(x_test)
+                        fscores.append(f1_score(ListYTest[i], y_pred))
+
+                if (len(fscores) > 1):
+                    avg_fscore = np.mean(fscores)
+                    print(f"Average F1 score: '{avg_fscore}'")
+                    if avg_fscore > best_fscore:
                         best_fscore = avg_fscore
                         best_criterion = criteria
                         best_TH = thre
                         bestN = selectedFeatures
 
-    return best_criterion, best_TH, bestN, best_fscore
+                    if avg_fscore == best_fscore:
+                        if (len(selectedFeatures) < len(bestN)):  # ??
+                            best_fscore = avg_fscore
+                            best_criterion = criteria
+                            best_TH = thre
+                            bestN = selectedFeatures
+
+        # Salva le variabili in un dizionario
+        BestConfiguration = {"best_criterion": best_criterion, "best_TH": best_TH,
+                             "bestN": bestN, "best_fscore": best_fscore, }
+
+        # Salva il dizionario in un file usando pickle
+        with open(serialize_dir, "wb") as f:
+            pickle.dump(BestConfiguration, f)
+        print("\nCompleted!\n")
+
+        return best_criterion, best_TH, bestN, best_fscore
+
+
+def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, ListYTest, explained_variance, min_t, max_t, step):
+
+    print("\nComputing best configuration...\n")
+
+    script_path = Path(__file__)
+
+    # Crea il percorso completo al file utilizzando pathlib
+    serialize_dir = script_path.parent / "Serialized" / "BestConfiguration.pkl"
+
+    # Verifica se il file esiste
+    if os.path.exists(serialize_dir):
+        # Se il file esiste, leggi i parametri
+        with open(serialize_dir, "rb") as f:
+            bestConfiguration = pickle.load(f)
+
+        best_criterion = bestConfiguration["best_criterion"]
+        best_TH = bestConfiguration["best_TH"]
+        bestN = bestConfiguration["bestN"]
+        best_fscore = bestConfiguration["best_fscore"]
+
+        print("\nCompleted!\n")
+        return best_criterion, best_TH, bestN, best_fscore
+
+    else:
+
+        best_criterion = None
+        best_TH = None
+        bestN = None
+        best_fscore = 0
+
+        criterion = ['gini', 'entropy']
+
+        for criteria in criterion:
+            for thre in np.arange(min_t, max_t, step):
+                avg_fscore = 0
+                fscores = []
+                selectedFeatures = topFeatureSelect(rank, thre)
+                if (len(selectedFeatures) > 0):
+                    # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
+                    for i in range(len(ListXTrain)):
+                        x_train_feature_selected = ListXTrain[i].loc[:,
+                                                                     selectedFeatures]
+                        x_test = ListXTest[i].loc[:, selectedFeatures]
+                        clf = decisionTreeLearner(
+                            x_train_feature_selected, ListYTrain[i], criteria)
+
+                        y_pred = clf.predict(x_test)
+                        fscores.append(f1_score(ListYTest[i], y_pred))
+
+                if (len(fscores) > 1):
+                    avg_fscore = np.mean(fscores)
+                    print(f"Average F1 score: '{avg_fscore}'")
+                    if avg_fscore > best_fscore:
+                        best_fscore = avg_fscore
+                        best_criterion = criteria
+                        best_TH = thre
+                        bestN = selectedFeatures
+
+                    if avg_fscore == best_fscore:
+                        if (len(selectedFeatures) < len(bestN)):  # ??
+                            best_fscore = avg_fscore
+                            best_criterion = criteria
+                            best_TH = thre
+                            bestN = selectedFeatures
+
+        # Salva le variabili in un dizionario
+        BestConfiguration = {"best_criterion": best_criterion, "best_TH": best_TH,
+                             "bestN": bestN, "best_fscore": best_fscore, }
+
+        # Salva il dizionario in un file usando pickle
+        with open(serialize_dir, "wb") as f:
+            pickle.dump(BestConfiguration, f)
+        print("\nCompleted!\n")
+
+        return best_criterion, best_TH, bestN, best_fscore
+
+
+def ConfusionMatrixBuilder(clf, y_pred, y_test):
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm,
+                                  display_labels=clf.classes_)
+    disp.plot()
+    plt.show()
 
 
 """
