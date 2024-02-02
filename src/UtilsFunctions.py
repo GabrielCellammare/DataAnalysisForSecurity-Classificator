@@ -96,7 +96,6 @@ Funziona che conta le occorrenze per ogni classe, restituisce un oggetto series
 
 def differentClass(y):
     conteggio_valori = y['Label'].value_counts()
-    print(type(conteggio_valori))
     return conteggio_valori
 
 
@@ -151,8 +150,8 @@ def BoxPlotPreAnalysisData(x, y, boxPlotDir):
     print("\nCompleted\n")
 
 
-"""
-def BoxPlotPreAnalysisData1(x, y, boxPlotDir, overlapDir):
+def BoxPlotPreAnalysisDataFeatureSelection(x, y, boxPlotDir, overlapDir):
+    print("\nFeature Selection, Saving Box Plot in 'BoxPlot' Folder...\n")
     # Ottieni la lista dei file nella cartella
     elenco_fileboxPlotDir = os.listdir(boxPlotDir)
     elenco_fileoverlapDir = os.listdir(overlapDir)
@@ -191,7 +190,8 @@ def BoxPlotPreAnalysisData1(x, y, boxPlotDir, overlapDir):
         plt.ylabel('Dati')
         plt.savefig(file_name)
         plt.close()
-"""
+    print("\nCompleted!\n")
+
 
 """
 Funzione che calcola il mutal info e restituisce un dict contenente in sorted_x[0] il nome della colonna, e in sorted_x[1] il valore
@@ -295,11 +295,12 @@ fit=calcola autovalori e autovettori, parametri utilizzati per trasformare i dat
 
 
 def pca(X):
+    print("\nTraining PCA...\n")
     pca = PCA(n_components=len(X.columns))
     pca.fit(X)
     feature_names = pca.get_feature_names_out()
-
     return pca, feature_names, pca.explained_variance_ratio_
+    print("\nCompleted!\n")
 
 
 """
@@ -308,6 +309,7 @@ Applicazione del PCA tramite un oggetto pca
 
 
 def applyPCA(X, pca, pcalist):
+    print("\nApplying PCA...\n")
     # Trasforma il DataFrame utilizzando PCA
     transformed = pca.transform(X)
     print(transformed)
@@ -317,25 +319,24 @@ def applyPCA(X, pca, pcalist):
     print(f"\ntransformed: '{transformed}'\n", )
     print(f"\nDataframePCA: '{df_pca}\n")
     return df_pca
+    print("\nCompleted!\n")
 
 
 "Selezione di Alcune delle PC con un determinato threesold"
 
 
-def NumberOfTopPCSelect(explained_variance, threesold):
-    n = 0
-    i = 0
-    if (explained_variance[i] < threesold):
-        sumVariance = explained_variance[i]
-        n = n+1
-        i = i+1
-        while (sumVariance < threesold) and i < len(explained_variance):
-            sumVariance = sumVariance+explained_variance[i]
-            n = n+1
-            i = i+1
-        return n
-    else:
-        return 0
+def NumberOfTopPCSelect(explained_variance, thresold):
+    cumulative_variance = 0.0
+    num_components = 0
+
+    for variance in explained_variance:
+        cumulative_variance += variance
+        num_components += 1
+
+        if cumulative_variance >= thresold:
+            break
+
+    return num_components
 
 
 def stratifiedKFold(X, Y, folds=5):
@@ -382,13 +383,20 @@ def decisionTreeLearner(X, Y, c='entropy'):
     return clf
 
 
-def showTree(clf, script_pathTreeFolder):
+"""
+CLF Oggetto Decision Tree
+Funzione che stampa l'albero e lo salva nell'apposita cartella
+"""
+
+
+def showTree(clf, script_pathTreeFolder, TreeType):
 
     plt.figure(figsize=(15, 10))
     tree.plot_tree(clf,
                    filled=True,
                    rounded=True)
-    file_name = os.path.join(script_pathTreeFolder, 'TreeFigOutput.pdf')
+    file_name = os.path.join(script_pathTreeFolder,
+                             f'TreeFigOutput{TreeType}.pdf')
     plt.savefig(file_name,
                 format='pdf', dpi=1000)
     plt.show()
@@ -396,12 +404,13 @@ def showTree(clf, script_pathTreeFolder):
 
 def determineDecisionTreekFoldConfiguration(ListXTrain, ListYTrain, ListXTest, ListYTest, rank, min_t, max_t, step):
 
-    print("\nComputing best configuration...\n")
+    print("\nComputing best configuration with Mutual Info...\n")
 
     script_path = Path(__file__)
 
     # Crea il percorso completo al file utilizzando pathlib
-    serialize_dir = script_path.parent / "Serialized" / "BestConfiguration.pkl"
+    serialize_dir = script_path.parent.parent / \
+        "Serialized" / "BestConfigurationMutualInfo.pkl"
 
     # Verifica se il file esiste
     if os.path.exists(serialize_dir):
@@ -473,12 +482,13 @@ def determineDecisionTreekFoldConfiguration(ListXTrain, ListYTrain, ListXTest, L
 
 def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, ListYTest, explained_variance, min_t, max_t, step):
 
-    print("\nComputing best configuration...\n")
+    print("\nComputing best configuration with PCA...\n")
 
     script_path = Path(__file__)
 
     # Crea il percorso completo al file utilizzando pathlib
-    serialize_dir = script_path.parent / "Serialized" / "BestConfiguration.pkl"
+    serialize_dir = script_path.parent.parent / \
+        "Serialized" / "BestConfigurationPCA.pkl"
 
     # Verifica se il file esiste
     if os.path.exists(serialize_dir):
@@ -486,34 +496,32 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
         with open(serialize_dir, "rb") as f:
             bestConfiguration = pickle.load(f)
 
-        best_criterion = bestConfiguration["best_criterion"]
-        best_TH = bestConfiguration["best_TH"]
-        bestN = bestConfiguration["bestN"]
-        best_fscore = bestConfiguration["best_fscore"]
+        best_criterionPCA = bestConfiguration["best_criterionPCA"]
+        bestTHPCA = bestConfiguration["bestTHPCA"]
+        bestNPCA = bestConfiguration["bestNPCA"]
+        bestEvalPCA = bestConfiguration["bestEvalPCA"]
 
         print("\nCompleted!\n")
-        return best_criterion, best_TH, bestN, best_fscore
+        return best_criterionPCA, bestTHPCA, bestNPCA, bestEvalPCA
 
     else:
-
-        best_criterion = None
-        best_TH = None
-        bestN = None
-        best_fscore = 0
+        best_criterionPCA = None
+        bestTHPCA = None
+        bestNPCA = None
+        bestEvalPCA = 0
 
         criterion = ['gini', 'entropy']
 
         for criteria in criterion:
             for thre in np.arange(min_t, max_t, step):
-                avg_fscore = 0
                 fscores = []
-                selectedFeatures = topFeatureSelect(rank, thre)
-                if (len(selectedFeatures) > 0):
+                n = NumberOfTopPCSelect(explained_variance, thre)
+                if (n > 0):
                     # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
                     for i in range(len(ListXTrain)):
-                        x_train_feature_selected = ListXTrain[i].loc[:,
-                                                                     selectedFeatures]
-                        x_test = ListXTest[i].loc[:, selectedFeatures]
+                        # indicizzazione di tipo :n in Python seleziona gli elementi dall’indice 0 all’indice n-1
+                        x_train_feature_selected = ListXTrain[i].iloc[:, :n]
+                        x_test = ListXTest[i].iloc[:, :n]
                         clf = decisionTreeLearner(
                             x_train_feature_selected, ListYTrain[i], criteria)
 
@@ -523,58 +531,38 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
                 if (len(fscores) > 1):
                     avg_fscore = np.mean(fscores)
                     print(f"Average F1 score: '{avg_fscore}'")
-                    if avg_fscore > best_fscore:
-                        best_fscore = avg_fscore
-                        best_criterion = criteria
-                        best_TH = thre
-                        bestN = selectedFeatures
+                    if avg_fscore > bestEvalPCA:
+                        bestEvalPCA = avg_fscore
+                        best_criterionPCA = criteria
+                        bestTHPCA = thre
+                        bestNPCA = n
 
-                    if avg_fscore == best_fscore:
-                        if (len(selectedFeatures) < len(bestN)):  # ??
-                            best_fscore = avg_fscore
-                            best_criterion = criteria
-                            best_TH = thre
-                            bestN = selectedFeatures
+                    if avg_fscore == bestEvalPCA:
+                        if (n < bestNPCA):  # ??
+                            bestEvalPCA = avg_fscore
+                            best_criterionPCA = criteria
+                            bestTHPCA = thre
+                            bestNPCA = n
 
         # Salva le variabili in un dizionario
-        BestConfiguration = {"best_criterion": best_criterion, "best_TH": best_TH,
-                             "bestN": bestN, "best_fscore": best_fscore, }
+        BestConfiguration = {"best_criterionPCA": best_criterionPCA, "bestTHPCA": bestNPCA,
+                             "bestNPCA": bestNPCA, "bestEvalPCA": bestEvalPCA, }
 
         # Salva il dizionario in un file usando pickle
         with open(serialize_dir, "wb") as f:
             pickle.dump(BestConfiguration, f)
         print("\nCompleted!\n")
 
-        return best_criterion, best_TH, bestN, best_fscore
+        return best_criterionPCA, bestTHPCA, bestNPCA, bestEvalPCA
 
 
-def ConfusionMatrixBuilder(clf, y_pred, y_test):
+def ConfusionMatrixBuilder(clf, y_pred, y_test, script_pathFolder, typeC):
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm,
                                   display_labels=clf.classes_)
     disp.plot()
+    file_name = os.path.join(script_pathFolder,
+                             f'ConfusionMatrixOutput{typeC}.pdf')
+    plt.savefig(file_name,
+                format='pdf', dpi=1000)
     plt.show()
-
-
-"""
-
-
-
-
-# Funzione che controlla se ci sono attributi mancanti, andando a controllare il "count"
-def missedValue(x):
-    columnsWrongCount = []
-    for col in x.columns:
-        col_data = x[col]
-        col_description = col_data.describe()
-        if col_description["count"] != 12000:
-            count = col_description["count"]
-            columnsWrongCount.append(col)
-            print(f"La colonna '{
-                  col}' ha un count ha degli attributi mancanti, count: '{count}'")
-    if len(columnsWrongCount) == 0:
-        print("Non ci sono colonne con attributi mancanti")
-
-    return columnsWrongCount
-
-"""
