@@ -1,5 +1,6 @@
 from UtilsFunctions import *
 from sklearn.metrics import classification_report
+from UtilsDecisionTree import determineDecisionTreekFoldConfigurationPCA, decisionTreeLearner, showTree
 
 # adopt the stratified CV to determine the best decision tree configuration on the pcs
 
@@ -13,7 +14,7 @@ def DecisionTreePCA(x, y, script_path, removed_columns):
     pcaObj, pcalist, explained_variancePCA = pca(
         x)  # valutare anche x_mutual info
     print("\nExplained variance: ", explained_variancePCA, "\n")
-    XPCA = applyPCA(x, pcaObj, pcalist)
+    XPCA = applyPCA(x, pcaObj, pcalist)  # Applicazione sull'intero dataset
 
     ListXTrainPCA, ListXTestPCA, ListYTrainPCA, ListYTestPCA = stratifiedKFold(
         XPCA, y, folds)
@@ -28,7 +29,7 @@ def DecisionTreePCA(x, y, script_path, removed_columns):
     DTPCA = decisionTreeLearner(
         XPCA.iloc[:, :bestNPCA], y, bestCriterionPCA)
     script_pathTreeFolder = script_path.parent.parent / "TreeFigOutput"
-    showTree(DTPCA, script_pathTreeFolder, "PCA")
+    showTree(DTPCA, script_pathTreeFolder, "DecisionTreePCA")
 
     data_dir = script_path.parent.parent / "Data"
     pathTestX = data_dir / "EmberXTest.csv"
@@ -53,6 +54,7 @@ def DecisionTreePCA(x, y, script_path, removed_columns):
         x_test_cleaned.shape}'\n")
 
     X_TestPCA = applyPCA(x_test_cleaned, pcaObj, pcalist)
+
     x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, :bestNPCA]
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
@@ -64,4 +66,6 @@ def DecisionTreePCA(x, y, script_path, removed_columns):
     target_names = ['class 0', 'class 1']
     print(classification_report(y_test, y_pred, target_names=target_names))
 
-    ConfusionMatrixBuilder(DTPCA, y_pred, y_test)
+    script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
+    ConfusionMatrixBuilder(DTPCA, y_pred, y_test,
+                           script_pathFolder, "DecisionTreePCA")

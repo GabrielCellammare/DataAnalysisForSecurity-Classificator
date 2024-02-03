@@ -1,9 +1,9 @@
 from UtilsFunctions import *
 from sklearn.metrics import classification_report
-from UtilsDecisionTree import decisionTreeLearner, showTree, determineDecisionTreekFoldConfigurationMutualInfo
+from UtilsRandomForest import randomForestLearner, determineRFkFoldConfiguration
 
 
-def DecisionTreeMutualInfo(x, y, script_path, removed_columns):
+def RandomForestMutualInfo(x, y, script_path, removed_columns):
     serialize_dir = script_path.parent.parent / \
         "Serialized" / "MutualInfoTraining.pkl"
     # Verifica se il file esiste
@@ -45,18 +45,20 @@ def DecisionTreeMutualInfo(x, y, script_path, removed_columns):
     print("\n\nListYTest")
     printFolds(ListYTest)
 
-    bestCriterion, bestTH, bestN, bestEval = determineDecisionTreekFoldConfigurationMutualInfo(
+    best_criterion, best_TH, bestN, best_fscore, best_n_tree, best_rand, best_bootstrap_s = determineRFkFoldConfiguration(
         ListXTrain, ListYTrain, ListXTest, ListYTest, rank, minThreshold, maxThreshold, stepThreshold)
 
     print('Feature Ranking by MI:\n',
-          'Best criterion = ', bestCriterion, "\n"
-          'best MI threshold = ', bestTH, "\n", 'best N = ', bestN, "\n", 'Best CV F = ', bestEval)
+          'Best criterion = ', best_criterion, "\n"
+          'best MI threshold = ', best_TH, "\n", 'best N = ', bestN, "\n", 'Best CV F = ', best_fscore,
+          "\n"'best number of tree = ', best_n_tree, "\n",
+          "\n"'best rand (Max Features) = ', best_rand, "\n",
+          "\n"'best bootstrap size = ', best_bootstrap_s, "\n")
 
     # Prendo le feature migliori (Mutual info)
-    toplist = topFeatureSelect(rank, bestTH)
-    DT = decisionTreeLearner(x.loc[:, toplist], y, bestCriterion)
-    script_pathTreeFolder = script_path.parent.parent / "TreeFigOutput"
-    showTree(DT, script_pathTreeFolder, "DecisionTreeMutualInfo")
+    toplist = topFeatureSelect(rank, best_TH)
+    RF = randomForestLearner(
+        x.loc[:, toplist], y, best_n_tree, best_criterion, best_rand, best_bootstrap_s)
 
     # Laboratorio 6
 
@@ -89,10 +91,10 @@ def DecisionTreeMutualInfo(x, y, script_path, removed_columns):
     print(f"Data Test: Nuova lista di attributi con dimensione: '{
         x_test_cleaned_feature.shape}'\n")
 
-    y_pred = DT.predict(x_test_cleaned_feature)
+    y_pred = RF.predict(x_test_cleaned_feature)
     target_names = ['class 0', 'class 1']
     print(classification_report(y_test, y_pred, target_names=target_names))
 
     script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
     ConfusionMatrixBuilder(
-        DT, y_pred, y_test, script_pathFolder, "DecisionTreeMUTUALINFO")
+        RF, y_pred, y_test, script_pathFolder, "RandomForestMUTUALINFO")
