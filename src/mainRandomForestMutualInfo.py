@@ -1,6 +1,6 @@
 from UtilsFunctions import *
 from sklearn.metrics import classification_report
-from UtilsRandomForest import randomForestLearner, determineRFkFoldConfiguration
+from UtilsRandomForest import randomForestLearner, determineRFkFoldConfigurationMutualInfo
 
 
 def RandomForestMutualInfo(x, y, script_path, removed_columns):
@@ -45,7 +45,7 @@ def RandomForestMutualInfo(x, y, script_path, removed_columns):
     print("\n\nListYTest")
     printFolds(ListYTest)
 
-    best_criterion, best_TH, bestN, best_fscore, best_n_tree, best_rand, best_bootstrap_s = determineRFkFoldConfiguration(
+    best_criterion, best_TH, bestN, best_fscore, best_n_tree, best_rand, best_bootstrap_s = determineRFkFoldConfigurationMutualInfo(
         ListXTrain, ListYTrain, ListXTest, ListYTest, rank, minThreshold, maxThreshold, stepThreshold)
 
     print('Feature Ranking by MI:\n',
@@ -97,4 +97,4 @@ def RandomForestMutualInfo(x, y, script_path, removed_columns):
 
     script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
     ConfusionMatrixBuilder(
-        RF, y_pred, y_test, script_pathFolder, "RandomForestMUTUALINFO")
+        RF, y_pred, y_test, script_pathFolder, "RandomForestPCA")

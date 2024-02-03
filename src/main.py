@@ -3,6 +3,7 @@ from mainDescribeData import *
 from mainDecisionTreeMutualInfo import DecisionTreeMutualInfo
 from mainDecisionTreePCA import DecisionTreePCA
 from mainRandomForestMutualInfo import RandomForestMutualInfo
+from mainRandomForestPCA import RandomForestPCA
 
 from pathlib import Path
 
@@ -34,4 +35,5 @@ print(f"Nuova lista di attributi con dimensione: '{x_cleaned.shape}'\n")
 # DescribeData(x_cleaned, y, script_path)
 DecisionTreeMutualInfo(x_cleaned, y, script_path, removed_columns)
 DecisionTreePCA(x_cleaned, y, script_path, removed_columns)
-# RandomForestMutualInfo(x_cleaned, y, script_path, removed_columns)
+RandomForestMutualInfo(x_cleaned, y, script_path, removed_columns)
+RandomForestPCA(x_cleaned, y, script_path, removed_columns)
