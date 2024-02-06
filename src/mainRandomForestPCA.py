@@ -27,7 +27,8 @@ def RandomForestPCA(x, y, script_path, removed_columns):
           "\nbest_randPCA: ", best_randPCA, "\nbest_bootstrap_sPCA: ", best_bootstrap_sPCA)
 
     RFPCA = randomForestLearner(
-        XPCA.iloc[:, :bestNPCA], y, best_n_treePCA, best_criterionPCA, best_randPCA, best_bootstrap_sPCA)
+        XPCA.iloc[:, 1:(
+            bestNPCA+1)], y, best_n_treePCA, best_criterionPCA, best_randPCA, best_bootstrap_sPCA)
 
     data_dir = script_path.parent.parent / "Data"
     pathTestX = data_dir / "EmberXTest.csv"
@@ -53,10 +54,12 @@ def RandomForestPCA(x, y, script_path, removed_columns):
 
     X_TestPCA = applyPCA(x_test_cleaned, pcaObj, pcalist)
 
-    x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, :bestNPCA]
+    x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, 1:(
+        bestNPCA+1)]
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
-        x.iloc[:, :bestNPCA].shape}'\n")
+        x.iloc[:, 1:(
+            bestNPCA+1)].shape}'\n")
     print(f"Data Test: Nuova lista di attributi con dimensione: '{
         x_TestPCA_cleaned_feature.shape}'\n")
 
@@ -66,4 +69,4 @@ def RandomForestPCA(x, y, script_path, removed_columns):
 
     script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
     ConfusionMatrixBuilder(RFPCA, y_pred, y_test,
-                           script_pathFolder, "DecisionTreePCA")
+                           script_pathFolder, "RandomForestPCA")

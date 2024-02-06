@@ -1,10 +1,9 @@
-from UtilsFunctions import *
-from mainDescribeData import *
+from UtilsFunctions import loadData, removeColumnsWithMinMaxEqual, removeColumnsWithMinMaxEqualTest
+from mainDescribeData import DescribeData
 from mainDecisionTreeMutualInfo import DecisionTreeMutualInfo
 from mainDecisionTreePCA import DecisionTreePCA
 from mainRandomForestMutualInfo import RandomForestMutualInfo
 from mainRandomForestPCA import RandomForestPCA
-
 from pathlib import Path
 
 
@@ -25,15 +24,16 @@ y = loadData(pathTrainY)
 # Rimozione delle colonne inutili. Vengono rimosse le colonne con Min=Max (Dati uguali)
 # Sarà necessario rimuovere le stesse nel test
 
-x_cleaned, removed_columns = removeColumnsWithMinMaxEqual(x)
+x_cleaned, removed_columnsMaxMin = removeColumnsWithMinMaxEqual(x)
 
 # Stampa dei nomi delle colonne rimosse e della dimensione della lista con le colonne rimanenti
-print(f"Nomi delle colonne rimosse: '{removed_columns}'\n")
+print(f"Nomi delle colonne rimosse: '{removed_columnsMaxMin}'\n")
 print(f"Nuova lista di attributi con dimensione: '{x_cleaned.shape}'\n")
 
 
 # DescribeData(x_cleaned, y, script_path)
-DecisionTreeMutualInfo(x_cleaned, y, script_path, removed_columns)
-DecisionTreePCA(x_cleaned, y, script_path, removed_columns)
-RandomForestMutualInfo(x_cleaned, y, script_path, removed_columns)
-RandomForestPCA(x_cleaned, y, script_path, removed_columns)
+# DecisionTreeMutualInfo(x_cleaned, y, script_path,
+# removed_columnsMaxMin)
+# DecisionTreePCA(x_cleaned, y, script_path, removed_columnsMaxMin)
+# RandomForestMutualInfo(x_cleaned, y, script_path, removed_columnsMaxMin)
+RandomForestPCA(x_cleaned, y, script_path, removed_columnsMaxMin)

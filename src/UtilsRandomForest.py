@@ -25,10 +25,8 @@ If bootstrap is True, the number of samples to draw from X to train each base es
 def randomForestLearner(x, y, n_tree, c, rand, bootstrap_s):
     rlf = RandomForestClassifier(n_estimators=n_tree, criterion=c,
                                  max_features=rand, max_samples=bootstrap_s, random_state=seed)
-    rlf.min_samples_split = 500  # Numero minimo di esempi per mettere uno split
+    # rlf.min_samples_split = 500  # Numero minimo di esempi per mettere uno split
     # Tree_ dentro c'è l'albero addestrata
-
-    print(np.ravel(y))
     rlf.fit(x, np.ravel(y))
 
     return rlf
@@ -119,9 +117,6 @@ def determineRFkFoldConfigurationMutualInfo(ListXTrain, ListYTrain, ListXTest, L
                                     best_n_tree = n_tree
                                     best_rand = rand
                                     best_bootstrap_s = b_size
-                            print("\nbest_criterion: ", best_criterion, "\nbest_TH:", best_TH,
-                                  "\nbestN: ", bestN, "\nbest_fscore: ", best_fscore, "\nbest_n_tree: ", best_n_tree,
-                                  "\nbest_rand: ", best_rand, "\nbest_bootstrap_s: ", best_bootstrap_s)
 
         # Salva le variabili in un dizionario
         BestConfiguration = {"best_criterion": best_criterion, "best_TH": best_TH,
@@ -222,10 +217,6 @@ def determineRFkFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, ListYTes
                                     best_n_treePCA = n_tree
                                     best_randPCA = rand
                                     best_bootstrap_sPCA = b_size
-
-                            print("\nbest_criterionPCA: ", best_criterionPCA, "\nbest_THPCA:", best_THPCA,
-                                  "\nbestNPCA: ", bestNPCA, "\nbest_fscorePCA: ", best_fscorePCA, "\nbest_n_treePCA: ", best_n_treePCA,
-                                  "\nbest_randPCA: ", best_randPCA, "\nbest_bootstrap_sPCA: ", best_bootstrap_sPCA)
 
         # Salva le variabili in un dizionario
         BestConfiguration = {"best_criterionPCA": best_criterionPCA, "best_TH": best_THPCA,

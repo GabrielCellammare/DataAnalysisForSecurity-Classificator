@@ -1,9 +1,10 @@
 from UtilsFunctions import *
 from sklearn.metrics import classification_report
 from UtilsDecisionTree import decisionTreeLearner, showTree, determineDecisionTreekFoldConfigurationMutualInfo
+import pickle
 
 
-def DecisionTreeMutualInfo(x, y, script_path, removed_columns):
+def DecisionTreeMutualInfo(x, y, script_path, removed_columnsMinMax):
     serialize_dir = script_path.parent.parent / \
         "Serialized" / "MutualInfoTraining.pkl"
     # Verifica se il file esiste
@@ -19,6 +20,9 @@ def DecisionTreeMutualInfo(x, y, script_path, removed_columns):
         # Salva il dizionario in un file usando pickle
         with open(serialize_dir, "wb") as f:
             pickle.dump(MutualInfoTraining, f)
+        boxPlotDirMutualInfo = script_path.parent.parent / "BoxPlotMutualInfo"
+        BoxPlotAnalysisDataMutualInfo(
+            x, y, boxPlotDirMutualInfo, rank)
 
     minThreshold = 0
     maxMutualInfo = 0.0
@@ -73,8 +77,8 @@ def DecisionTreeMutualInfo(x, y, script_path, removed_columns):
     # Utilizzo il tree migliore
 
     # Rimozione delle colonne inutili. Vengono rimosse le colonne con Min=Max (Dati uguali con x)
-    x_test_cleaned = removeColumnsWithMinMaxEqualTest(x_test, removed_columns)
-
+    x_test_cleaned = removeColumnsWithMinMaxEqualTest(
+        x_test, removed_columnsMinMax)
     # Stampa dei nomi delle colonne rimosse e della dimensione della lista con le colonne rimanenti
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
@@ -82,7 +86,7 @@ def DecisionTreeMutualInfo(x, y, script_path, removed_columns):
     print(f"Data Test: Nuova lista di attributi con dimensione: '{
         x_test_cleaned.shape}'\n")
 
-    x_test_cleaned_feature = x_test.loc[:, toplist]
+    x_test_cleaned_feature = x_test_cleaned.loc[:, toplist]
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
         x.loc[:, toplist].shape}'\n")
@@ -95,4 +99,4 @@ def DecisionTreeMutualInfo(x, y, script_path, removed_columns):
 
     script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
     ConfusionMatrixBuilder(
-        DT, y_pred, y_test, script_pathFolder, "DecisionTreeMUTUALINFO")
+        DT, y_pred, y_test, script_pathFolder, "DecisionTreeMutualInfo")

@@ -156,6 +156,7 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
 
         for criteria in criterion:
             for thre in np.arange(min_t, max_t, step):
+                avg_fscore = 0
                 fscores = []
                 n = NumberOfTopPCSelect(explained_variance, thre)
                 if (n > 0):

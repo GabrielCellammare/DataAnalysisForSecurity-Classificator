@@ -1,6 +1,7 @@
 from UtilsFunctions import *
 from sklearn.metrics import classification_report
 from UtilsRandomForest import randomForestLearner, determineRFkFoldConfigurationMutualInfo
+import pickle
 
 
 def RandomForestMutualInfo(x, y, script_path, removed_columns):
@@ -19,6 +20,11 @@ def RandomForestMutualInfo(x, y, script_path, removed_columns):
         # Salva il dizionario in un file usando pickle
         with open(serialize_dir, "wb") as f:
             pickle.dump(MutualInfoTraining, f)
+
+        boxPlotDirMutualInfo = script_path.parent.parent / "BoxPlotMutualInfo"
+
+        BoxPlotAnalysisDataMutualInfo(
+            x, y, boxPlotDirMutualInfo, rank)
 
     minThreshold = 0
     maxMutualInfo = 0.0
@@ -97,4 +103,4 @@ def RandomForestMutualInfo(x, y, script_path, removed_columns):
 
     script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
     ConfusionMatrixBuilder(
-        RF, y_pred, y_test, script_pathFolder, "RandomForestPCA")
+        RF, y_pred, y_test, script_pathFolder, "RandomForestMutualInfo")

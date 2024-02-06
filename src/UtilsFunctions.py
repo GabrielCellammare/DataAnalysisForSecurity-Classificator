@@ -2,22 +2,17 @@ import os
 import pandas as pd
 from matplotlib import pyplot as plt
 from scipy import stats
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import mutual_info_classif
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.model_selection import StratifiedKFold
-from sklearn.tree import DecisionTreeClassifier
-from sklearn import tree
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import numpy as np
-from sklearn.metrics import f1_score
-import pickle
-from pathlib import Path
 
 
 """Funzione che legge il file csv e restituisce un dataframe"""
 
+# Seed per evitare la randomicità
 seed = 42
 np.random.seed(seed)
 goodMalware = "'Goodware - Malware'"
@@ -65,6 +60,11 @@ def removeColumnsWithMinMaxEqual(x):
     # x drop accetta come parametro columns = ['Colonna A, B, C']
     print("\nCompleted!\n")
     return x_cleaned, columns_to_remove
+
+
+"""
+Funzione che prende in input un set di colonne da rimuovere e rimuove le suddette dal dataset
+"""
 
 
 def removeColumnsWithMinMaxEqualTest(x, columnsremoving):
@@ -151,11 +151,14 @@ def BoxPlotPreAnalysisData(x, y, boxPlotDir):
     print("\nCompleted\n")
 
 
-def BoxPlotPreAnalysisDataFeatureSelection(x, y, boxPlotDir, overlapDir):
-    print("\nFeature Selection, Saving Box Plot in 'BoxPlot' Folder...\n")
+# Seleziona le variabili meno significative e le plotta, osservando i campioni
+def BoxPlotPreAnalysisDataSelection(x, y, boxPlotDir, overlapDir):
+    print("\nData Selection, Saving Box Plot in 'BoxPlot' Folder...\n")
     # Ottieni la lista dei file nella cartella
     elenco_fileboxPlotDir = os.listdir(boxPlotDir)
     elenco_fileoverlapDir = os.listdir(overlapDir)
+
+    columnsToRemove = []
 
     # Itera attraverso la lista dei file e rimuove i file
     for file in elenco_fileboxPlotDir:
@@ -171,17 +174,19 @@ def BoxPlotPreAnalysisDataFeatureSelection(x, y, boxPlotDir, overlapDir):
         # Crea il box plot
         box_plot = x.boxplot(column=col, by='Label')
 
-        # Calcola la distribuzione dei dati per ogni gruppo
-        group1 = x[x['Label'] == 0][col]
-        group2 = x[x['Label'] == 1][col]
-
-        # Esegui il test di Kolmogorov-Smirnov
-        ks_stat, p_value = stats.ks_2samp(group1, group2)
+        # Crea una lista di valori per ogni classe
+        values = [x[x['Label'] == cls][col]
+                  for cls in x['Label'].unique()]
+        # Esegui il test ANOVA
+        f_val, p_val = stats.f_oneway(*values)
+        print(f"La variabile {col} ha un valore F di {
+              f_val} e un valore p di {p_val}")
 
         # Verifica se i box plot si sovrappongono
-        if p_value > 0.10:  # Soglia di significatività
+        if p_val > 0.1:  # Soglia di significatività...come si sceglie la significatività?
             # Se i box plot si sovrappongono, salva il box plot in overlapDir
             file_name = os.path.join(overlapDir, f'boxplot_{col}.png')
+            columnsToRemove.append(col)
         else:
             # Altrimenti, salva il box plot in boxPlotDir
             file_name = os.path.join(boxPlotDir, f'boxplot_{col}.png')
@@ -192,6 +197,7 @@ def BoxPlotPreAnalysisDataFeatureSelection(x, y, boxPlotDir, overlapDir):
         plt.savefig(file_name)
         plt.close()
     print("\nCompleted!\n")
+    return columnsToRemove
 
 
 """
@@ -217,7 +223,11 @@ def mutualInfoRank(X, Y):
     return sorted_x
 
 
-"""Stampa i box blot delle variabili indipendenti con mutual info elevato e non"""
+"""
+Stampa i box blot delle variabili indipendenti con mutual info elevato e non
+nprint=numero di stampe
+n=10 stamperà le prime 10 variabili significative e le ultime 10, escludendo quelle con mutual info=0
+"""
 
 
 def BoxPlotAnalysisDataMutualInfo(x, y, boxPlotDir, mutualInfo={}, n_print=10):
@@ -299,7 +309,9 @@ def pca(X):
     print("\nTraining PCA...\n")
     pca = PCA(n_components=len(X.columns))
     pca.fit(X)
+    # Nome delle nuove feature del tipo pca0...pcan
     feature_names = pca.get_feature_names_out()
+    print(feature_names)
     return pca, feature_names, pca.explained_variance_ratio_
     print("\nCompleted!\n")
 
@@ -313,17 +325,13 @@ def applyPCA(X, pca, pcalist):
     print("\nApplying PCA...\n")
     # Trasforma il DataFrame utilizzando PCA
     transformed = pca.transform(X)
-    print(transformed)
     # Crea un nuovo DataFrame con le componenti principali
     df_pca = pd.DataFrame(transformed, columns=pcalist)
-    print(f"\npcalist: '{pcalist}'\n")
-    print(f"\ntransformed: '{transformed}'\n", )
-    print(f"\nDataframePCA: '{df_pca}\n")
     return df_pca
     print("\nCompleted!\n")
 
 
-"Selezione di Alcune delle PC con un determinato threesold"
+"Selezione di Alcune delle PC la cui somma della varianza superi un determinato threesold"
 
 
 def NumberOfTopPCSelect(explained_variance, thresold):
@@ -338,6 +346,12 @@ def NumberOfTopPCSelect(explained_variance, thresold):
             break
 
     return num_components
+
+
+"""
+Funzione che crea in base al numero di fold, un numero di training set e testing set definito per la Cross Validation
+
+"""
 
 
 def stratifiedKFold(X, Y, folds=5):

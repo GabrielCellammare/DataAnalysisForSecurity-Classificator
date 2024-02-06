@@ -27,7 +27,8 @@ def DecisionTreePCA(x, y, script_path, removed_columns):
           'best MI threshold', bestTHPCA, 'best N', bestNPCA, 'Best CV F', bestEvalPCA)
 
     DTPCA = decisionTreeLearner(
-        XPCA.iloc[:, :bestNPCA], y, bestCriterionPCA)
+        XPCA.iloc[:, 1:(
+            bestNPCA+1)], y, bestCriterionPCA)
     script_pathTreeFolder = script_path.parent.parent / "TreeFigOutput"
     showTree(DTPCA, script_pathTreeFolder, "DecisionTreePCA")
 
@@ -55,7 +56,8 @@ def DecisionTreePCA(x, y, script_path, removed_columns):
 
     X_TestPCA = applyPCA(x_test_cleaned, pcaObj, pcalist)
 
-    x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, :bestNPCA]
+    x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, 1:(
+        bestNPCA+1)]
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
         x.iloc[:, :bestNPCA].shape}'\n")
