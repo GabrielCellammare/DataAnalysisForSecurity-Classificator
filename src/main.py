@@ -4,6 +4,8 @@ from mainDecisionTreeMutualInfo import DecisionTreeMutualInfo
 from mainDecisionTreePCA import DecisionTreePCA
 from mainRandomForestMutualInfo import RandomForestMutualInfo
 from mainRandomForestPCA import RandomForestPCA
+from mainKNNMutualInfo import KNNMutualInfo
+from mainKNNPCA import KNNPCA
 from pathlib import Path
 
 
@@ -36,4 +38,6 @@ print(f"Nuova lista di attributi con dimensione: '{x_cleaned.shape}'\n")
 # removed_columnsMaxMin)
 # DecisionTreePCA(x_cleaned, y, script_path, removed_columnsMaxMin)
 # RandomForestMutualInfo(x_cleaned, y, script_path, removed_columnsMaxMin)
-RandomForestPCA(x_cleaned, y, script_path, removed_columnsMaxMin)
+# RandomForestPCA(x_cleaned, y, script_path, removed_columnsMaxMin)
+KNNMutualInfo(x_cleaned, y, script_path, removed_columnsMaxMin)
+KNNPCA(x_cleaned, y, script_path, removed_columnsMaxMin)
