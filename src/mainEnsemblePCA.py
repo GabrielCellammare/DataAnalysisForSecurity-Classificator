@@ -1,11 +1,11 @@
 from UtilsFunctions import *
 from sklearn.metrics import classification_report
-from UtilsDecisionTree import determineDecisionTreekFoldConfigurationPCA, decisionTreeLearner, showTree
+from UtilsEnsamble import EnsambleLearner, determineEnsamblekFoldConfigurationPCA
 
 # adopt the stratified CV to determine the best decision tree configuration on the pcs
 
 
-def DecisionTreePCA(x, y, script_path, x_test_cleaned, y_test):
+def EnsemblePCA(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, clf3):
     minThresholdPCA = 0.95
     stepThresholdPCA = 0.01
     maxThresholdPCA = 1.01
@@ -19,18 +19,16 @@ def DecisionTreePCA(x, y, script_path, x_test_cleaned, y_test):
     ListXTrainPCA, ListXTestPCA, ListYTrainPCA, ListYTestPCA = stratifiedKFold(
         XPCA, y, folds)
 
-    bestCriterionPCA, bestTHPCA, bestNPCA, bestEvalPCA = determineDecisionTreekFoldConfigurationPCA(
-        ListXTrainPCA, ListYTrainPCA, ListXTestPCA, ListYTestPCA, explained_variancePCA, minThresholdPCA, maxThresholdPCA, stepThresholdPCA)
+    bestTHPCA, bestNPCA, bestEvalPCA = determineEnsamblekFoldConfigurationPCA(
+        ListXTrainPCA, ListYTrainPCA, ListXTestPCA, ListYTestPCA, explained_variancePCA, minThresholdPCA, maxThresholdPCA, stepThresholdPCA, clf1, clf2, clf3)
 
-    print('Feature Ranking by MI:', 'Best criterion', bestCriterionPCA,
+    print('Feature Ranking by MI:',
 
           'best MI threshold', bestTHPCA, 'best N', bestNPCA, 'Best CV F', bestEvalPCA)
 
-    DTPCA = decisionTreeLearner(
+    ECLFPCA = EnsambleLearner(
         XPCA.iloc[:, 1:(
-            bestNPCA+1)], y, bestCriterionPCA)
-    script_pathTreeFolder = script_path.parent.parent / "TreeFigOutput"
-    showTree(DTPCA, script_pathTreeFolder, "DecisionTreePCA")
+            bestNPCA+1)], y, clf1, clf2, clf3)
 
     X_TestPCA = applyPCA(x_test_cleaned, pcaObj, pcalist)
 
@@ -42,12 +40,12 @@ def DecisionTreePCA(x, y, script_path, x_test_cleaned, y_test):
     print(f"Data Test: Nuova lista di attributi con dimensione: '{
         x_TestPCA_cleaned_feature.shape}'\n")
 
-    y_pred = DTPCA.predict(x_TestPCA_cleaned_feature)
+    y_pred = ECLFPCA.predict(x_TestPCA_cleaned_feature)
     target_names = ['class 0', 'class 1']
     print(classification_report(y_test, y_pred, target_names=target_names))
 
     script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
-    ConfusionMatrixBuilder(DTPCA, y_pred, y_test,
-                           script_pathFolder, "DecisionTreePCA")
+    ConfusionMatrixBuilder(ECLFPCA, y_pred, y_test,
+                           script_pathFolder, "EnsamblePCADecisionTreeRandomForestKNN")
 
-    return DTPCA
+    return ECLFPCA

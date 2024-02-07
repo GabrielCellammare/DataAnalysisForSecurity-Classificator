@@ -4,7 +4,7 @@ from UtilsDecisionTree import decisionTreeLearner, showTree, determineDecisionTr
 import pickle
 
 
-def DecisionTreeMutualInfo(x, y, script_path, removed_columnsMinMax):
+def DecisionTreeMutualInfo(x, y, script_path, x_test_cleaned, y_test):
     serialize_dir = script_path.parent.parent / \
         "Serialized" / "MutualInfoTraining.pkl"
     # Verifica se il file esiste
@@ -62,30 +62,6 @@ def DecisionTreeMutualInfo(x, y, script_path, removed_columnsMinMax):
     script_pathTreeFolder = script_path.parent.parent / "TreeFigOutput"
     showTree(DT, script_pathTreeFolder, "DecisionTreeMutualInfo")
 
-    # Laboratorio 6
-
-    data_dir = script_path.parent.parent / "Data"
-    pathTestX = data_dir / "EmberXTest.csv"
-    pathTestY = data_dir / "EmberYTest.csv"
-
-    x_test = loadData(pathTestX)
-    y_test = loadData(pathTestY)
-
-    print("\nShape di train_x:", x_test.shape)
-    print("\nShape di train_y:", y_test.shape)
-
-    # Utilizzo il tree migliore
-
-    # Rimozione delle colonne inutili. Vengono rimosse le colonne con Min=Max (Dati uguali con x)
-    x_test_cleaned = removeColumnsWithMinMaxEqualTest(
-        x_test, removed_columnsMinMax)
-    # Stampa dei nomi delle colonne rimosse e della dimensione della lista con le colonne rimanenti
-
-    print(f"Data Training: Nuova lista di attributi con dimensione: '{
-        x.shape}'\n")
-    print(f"Data Test: Nuova lista di attributi con dimensione: '{
-        x_test_cleaned.shape}'\n")
-
     x_test_cleaned_feature = x_test_cleaned.loc[:, toplist]
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
@@ -100,3 +76,5 @@ def DecisionTreeMutualInfo(x, y, script_path, removed_columnsMinMax):
     script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
     ConfusionMatrixBuilder(
         DT, y_pred, y_test, script_pathFolder, "DecisionTreeMutualInfo")
+
+    return DT

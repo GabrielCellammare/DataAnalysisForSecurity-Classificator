@@ -219,7 +219,7 @@ def determineRFkFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, ListYTes
                                     best_bootstrap_sPCA = b_size
 
         # Salva le variabili in un dizionario
-        BestConfiguration = {"best_criterionPCA": best_criterionPCA, "best_TH": best_THPCA,
+        BestConfiguration = {"best_criterionPCA": best_criterionPCA, "best_THPCA": best_THPCA,
                              "bestN": bestNPCA, "best_fscore": best_fscorePCA, "best_n_tree": best_n_treePCA,
                              "best_rand": best_randPCA, "best_bootstrap_s": best_bootstrap_sPCA}
 

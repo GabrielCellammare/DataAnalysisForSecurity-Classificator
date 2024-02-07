@@ -1,10 +1,10 @@
+from UtilsEnsamble import EnsambleLearner, determineEnsamblekFoldConfigurationMutualInfo
 from UtilsFunctions import *
 from sklearn.metrics import classification_report
-from UtilsRandomForest import randomForestLearner, determineRFkFoldConfigurationMutualInfo
 import pickle
 
 
-def RandomForestMutualInfo(x, y, script_path, x_test_cleaned, y_test):
+def EnsembleMutualInfo(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, clf3):
     serialize_dir = script_path.parent.parent / \
         "Serialized" / "MutualInfoTraining.pkl"
     # Verifica se il file esiste
@@ -20,9 +20,7 @@ def RandomForestMutualInfo(x, y, script_path, x_test_cleaned, y_test):
         # Salva il dizionario in un file usando pickle
         with open(serialize_dir, "wb") as f:
             pickle.dump(MutualInfoTraining, f)
-
         boxPlotDirMutualInfo = script_path.parent.parent / "BoxPlotMutualInfo"
-
         BoxPlotAnalysisDataMutualInfo(
             x, y, boxPlotDirMutualInfo, rank)
 
@@ -51,21 +49,15 @@ def RandomForestMutualInfo(x, y, script_path, x_test_cleaned, y_test):
     print("\n\nListYTest")
     printFolds(ListYTest)
 
-    best_criterion, best_TH, bestN, best_fscore, best_n_tree, best_rand, best_bootstrap_s = determineRFkFoldConfigurationMutualInfo(
-        ListXTrain, ListYTrain, ListXTest, ListYTest, rank, minThreshold, maxThreshold, stepThreshold)
+    bestTH, bestN, bestEval = determineEnsamblekFoldConfigurationMutualInfo(
+        ListXTrain, ListYTrain, ListXTest, ListYTest, rank, minThreshold, maxThreshold, stepThreshold, clf1, clf2, clf3)
 
     print('Feature Ranking by MI:\n',
-          'Best criterion = ', best_criterion, "\n"
-          'best MI threshold = ', best_TH, "\n", 'best N = ', bestN, "\n", 'Best CV F = ', best_fscore,
-          "\n"'best number of tree = ', best_n_tree, "\n",
-          "\n"'best rand (Max Features) = ', best_rand, "\n",
-          "\n"'best bootstrap size = ', best_bootstrap_s, "\n")
+          'best MI threshold = ', bestTH, "\n", 'best N = ', bestN, "\n", 'Best CV F = ', bestEval)
 
     # Prendo le feature migliori (Mutual info)
-    toplist = topFeatureSelect(rank, best_TH)
-
-    RF = randomForestLearner(
-        x.loc[:, toplist], y, best_n_tree, best_criterion, best_rand, best_bootstrap_s)
+    toplist = topFeatureSelect(rank, bestTH)
+    ECLF = EnsambleLearner(x.loc[:, toplist], y, clf1, clf2, clf3)
 
     x_test_cleaned_feature = x_test_cleaned.loc[:, toplist]
 
@@ -74,12 +66,12 @@ def RandomForestMutualInfo(x, y, script_path, x_test_cleaned, y_test):
     print(f"Data Test: Nuova lista di attributi con dimensione: '{
         x_test_cleaned_feature.shape}'\n")
 
-    y_pred = RF.predict(x_test_cleaned_feature)
+    y_pred = ECLF.predict(x_test_cleaned_feature)
     target_names = ['class 0', 'class 1']
     print(classification_report(y_test, y_pred, target_names=target_names))
 
     script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
     ConfusionMatrixBuilder(
-        RF, y_pred, y_test, script_pathFolder, "RandomForestMutualInfo")
+        ECLF, y_pred, y_test, script_pathFolder, "EnsambleMutualInfoDecisionTreeRandomForestKNN")
 
-    return RF
+    return ECLF
