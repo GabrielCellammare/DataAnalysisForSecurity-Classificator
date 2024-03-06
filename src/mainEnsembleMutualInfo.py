@@ -72,6 +72,6 @@ def EnsembleMutualInfo(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, cl
 
     script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
     ConfusionMatrixBuilder(
-        ECLF, y_pred, y_test, script_pathFolder, "EnsambleMutualInfoDecisionTreeRandomForestKNN")
+        ECLF, y_pred, y_test, script_pathFolder, "EnsambleMutualInfoDecisionTreeRandomForestKNNVotingSoft")
 
     return ECLF

@@ -9,9 +9,8 @@ from UtilsFunctions import NumberOfTopPCSelect, topFeatureSelect
 
 def EnsambleLearner(x, y, clf1, clf2, clf3):
     eclf = VotingClassifier(
-        estimators=[('dt', clf1), ('rf', clf2), ('knn', clf3)], voting='hard')
-    # rlf.min_samples_split = 500  # Numero minimo di esempi per mettere uno split
-    # Tree_ dentro c'è l'albero addestrata
+        estimators=[('dt', clf1), ('rf', clf2), ('knn', clf3)], voting='soft')
+
     eclf.fit(x, np.ravel(y))
     return eclf
 
@@ -24,7 +23,7 @@ def determineEnsamblekFoldConfigurationMutualInfo(ListXTrain, ListYTrain, ListXT
 
     # Crea il percorso completo al file utilizzando pathlib
     serialize_dir = script_path.parent.parent / \
-        "Serialized" / "BestConfigurationMutualInfoEnsemble.pkl"
+        "Serialized" / "BestConfigurationMutualInfoEnsembleSoftVoting.pkl"
 
     # Verifica se il file esiste
     if os.path.exists(serialize_dir):
@@ -95,7 +94,7 @@ def determineEnsamblekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, Li
 
     # Crea il percorso completo al file utilizzando pathlib
     serialize_dir = script_path.parent.parent / \
-        "Serialized" / "BestConfigurationPCAEnsemble.pkl"
+        "Serialized" / "BestConfigurationPCAEnsembleSoftVoting.pkl"
 
     # Verifica se il file esiste
     if os.path.exists(serialize_dir):

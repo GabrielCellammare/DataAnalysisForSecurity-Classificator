@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 from matplotlib import pyplot as plt
-from scipy import stats
 from sklearn.feature_selection import mutual_info_classif
 import numpy as np
 from sklearn.decomposition import PCA
@@ -151,55 +150,6 @@ def BoxPlotPreAnalysisData(x, y, boxPlotDir):
     print("\nCompleted\n")
 
 
-# Seleziona le variabili meno significative e le plotta, osservando i campioni
-def BoxPlotPreAnalysisDataSelection(x, y, boxPlotDir, overlapDir):
-    print("\nData Selection, Saving Box Plot in 'BoxPlot' Folder...\n")
-    # Ottieni la lista dei file nella cartella
-    elenco_fileboxPlotDir = os.listdir(boxPlotDir)
-    elenco_fileoverlapDir = os.listdir(overlapDir)
-
-    columnsToRemove = []
-
-    # Itera attraverso la lista dei file e rimuove i file
-    for file in elenco_fileboxPlotDir:
-        percorso_completo = os.path.join(boxPlotDir, file)
-        os.remove(percorso_completo)
-
-    for file in elenco_fileoverlapDir:
-        percorso_completo = os.path.join(overlapDir, file)
-        os.remove(percorso_completo)
-
-    x['Label'] = y['Label']
-    for col in x.columns:
-        # Crea il box plot
-        box_plot = x.boxplot(column=col, by='Label')
-
-        # Crea una lista di valori per ogni classe
-        values = [x[x['Label'] == cls][col]
-                  for cls in x['Label'].unique()]
-        # Esegui il test ANOVA
-        f_val, p_val = stats.f_oneway(*values)
-        print(f"La variabile {col} ha un valore F di {
-              f_val} e un valore p di {p_val}")
-
-        # Verifica se i box plot si sovrappongono
-        if p_val > 0.1:  # Soglia di significatività...come si sceglie la significatività?
-            # Se i box plot si sovrappongono, salva il box plot in overlapDir
-            file_name = os.path.join(overlapDir, f'boxplot_{col}.png')
-            columnsToRemove.append(col)
-        else:
-            # Altrimenti, salva il box plot in boxPlotDir
-            file_name = os.path.join(boxPlotDir, f'boxplot_{col}.png')
-
-        plt.title(f'Boxplot della colonna {col}')
-        plt.xlabel('goodMalware')
-        plt.ylabel('Dati')
-        plt.savefig(file_name)
-        plt.close()
-    print("\nCompleted!\n")
-    return columnsToRemove
-
-
 """
 Funzione che calcola il mutal info e restituisce un dict contenente in sorted_x[0] il nome della colonna, e in sorted_x[1] il valore
 del mutual info
@@ -233,20 +183,13 @@ n=10 stamperà le prime 10 variabili significative e le ultime 10, escludendo qu
 def BoxPlotAnalysisDataMutualInfo(x, y, boxPlotDir, mutualInfo={}, n_print=10):
     # Ottieni la lista dei file nella cartella
     print("\nSaving Mutual info variables Box Plot in 'BoxPlotMutualInfo' Folder...\n")
+
     boxPlotDirMutualInfoFirst = boxPlotDir / "MoreSignificant"
     boxPlotDirMutualInfoLast = boxPlotDir / "LessSignificant"
 
     elenco_file = os.listdir(boxPlotDirMutualInfoFirst)
-    # Itera attraverso la lista dei file e rimuovili
-    for file in elenco_file:
-        percorso_completo = os.path.join(boxPlotDirMutualInfoFirst, file)
-        os.remove(percorso_completo)
 
     elenco_file = os.listdir(boxPlotDirMutualInfoLast)
-    # Itera attraverso la lista dei file e rimuovili
-    for file in elenco_file:
-        percorso_completo = os.path.join(boxPlotDirMutualInfoLast, file)
-        os.remove(percorso_completo)
 
     i = 0
     if (mutualInfo):
@@ -312,8 +255,8 @@ def pca(X):
     # Nome delle nuove feature del tipo pca0...pcan
     feature_names = pca.get_feature_names_out()
     print(feature_names)
-    return pca, feature_names, pca.explained_variance_ratio_
     print("\nCompleted!\n")
+    return pca, feature_names, pca.explained_variance_ratio_
 
 
 """

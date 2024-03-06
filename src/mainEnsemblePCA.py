@@ -46,6 +46,6 @@ def EnsemblePCA(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, clf3):
 
     script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
     ConfusionMatrixBuilder(ECLFPCA, y_pred, y_test,
-                           script_pathFolder, "EnsamblePCADecisionTreeRandomForestKNN")
+                           script_pathFolder, "EnsamblePCADecisionTreeRandomForestKNNSoftVoting")
 
     return ECLFPCA

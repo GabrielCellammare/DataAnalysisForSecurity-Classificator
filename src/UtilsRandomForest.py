@@ -2,7 +2,6 @@ from pathlib import Path
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 import os
-from matplotlib import pyplot as plt
 from sklearn.metrics import f1_score
 import pickle
 from UtilsFunctions import topFeatureSelect, NumberOfTopPCSelect
@@ -25,8 +24,7 @@ If bootstrap is True, the number of samples to draw from X to train each base es
 def randomForestLearner(x, y, n_tree, c, rand, bootstrap_s):
     rlf = RandomForestClassifier(n_estimators=n_tree, criterion=c,
                                  max_features=rand, max_samples=bootstrap_s, random_state=seed)
-    # rlf.min_samples_split = 500  # Numero minimo di esempi per mettere uno split
-    # Tree_ dentro c'è l'albero addestrata
+
     rlf.fit(x, np.ravel(y))
 
     return rlf
@@ -209,7 +207,7 @@ def determineRFkFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, ListYTes
                                     best_bootstrap_sPCA = b_size
 
                             if avg_fscore == best_fscorePCA:
-                                if (n < bestNPCA):  # ??
+                                if (n < bestNPCA):
                                     best_fscorePCA = avg_fscore
                                     best_criterionPCA = criteria
                                     best_THPCA = thre
@@ -220,8 +218,8 @@ def determineRFkFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, ListYTes
 
         # Salva le variabili in un dizionario
         BestConfiguration = {"best_criterionPCA": best_criterionPCA, "best_THPCA": best_THPCA,
-                             "bestN": bestNPCA, "best_fscore": best_fscorePCA, "best_n_tree": best_n_treePCA,
-                             "best_rand": best_randPCA, "best_bootstrap_s": best_bootstrap_sPCA}
+                             "bestNPCA": bestNPCA, "best_fscorePCA": best_fscorePCA, "best_n_treePCA": best_n_treePCA,
+                             "best_randPCA": best_randPCA, "best_bootstrap_sPCA": best_bootstrap_sPCA}
 
         # Salva il dizionario in un file usando pickle
         with open(serialize_dir, "wb") as f:

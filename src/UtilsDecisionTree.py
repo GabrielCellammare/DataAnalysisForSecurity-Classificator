@@ -13,7 +13,7 @@ seed = 42
 np.random.seed(seed)
 
 
-def decisionTreeLearner(X, Y, c='entropy'):
+def decisionTreeLearner(X, Y, c):
     clf = DecisionTreeClassifier(criterion=c, random_state=seed)
     clf.min_samples_split = 500  # Numero minimo di esempi per mettere uno split
     # Tree_ dentro c'è l'albero addestrata
@@ -104,7 +104,7 @@ def determineDecisionTreekFoldConfigurationMutualInfo(ListXTrain, ListYTrain, Li
                         bestN = selectedFeatures
 
                     if avg_fscore == best_fscore:
-                        if (len(selectedFeatures) < len(bestN)):  # ??
+                        if (len(selectedFeatures) < len(bestN)):  # Criterio aggiuntivo
                             best_fscore = avg_fscore
                             best_criterion = criteria
                             best_TH = thre
@@ -112,7 +112,7 @@ def determineDecisionTreekFoldConfigurationMutualInfo(ListXTrain, ListYTrain, Li
 
         # Salva le variabili in un dizionario
         BestConfiguration = {"best_criterion": best_criterion, "best_TH": best_TH,
-                             "bestN": bestN, "best_fscore": best_fscore, }
+                             "bestN": bestN, "best_fscore": best_fscore}
 
         # Salva il dizionario in un file usando pickle
         with open(serialize_dir, "wb") as f:
