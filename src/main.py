@@ -35,13 +35,12 @@ print("\nShape di Train_y:", y_train.shape)
 
 x_cleanedTrain, removed_columnsMaxMin = removeColumnsWithMinMaxEqual(x_train)
 
-# Stampa dei nomi delle colonne rimosse e della dimensione della lista con le colonne rimanenti
-print(f"Nomi delle colonne rimosse dal dataset di training: '{
-      removed_columnsMaxMin}'\n")
-print(f"Nuovo dataset di training con dimensione: '{x_cleanedTrain.shape}'\n")
+# Si utilizza un'altra variabile per modificare il dataset aggiungendo la label per la stampa dei Box Plot
+x_boxPlotcleanedTrain, removed_columnsMaxMinBoxPlot = removeColumnsWithMinMaxEqual(
+    x_train)
 
 # Descrizione dati Training
-DescribeData(x_cleanedTrain, y_train, script_path)
+DescribeData(x_boxPlotcleanedTrain, y_train, script_path)
 
 
 # Inizializzo test
@@ -60,36 +59,36 @@ print("\nShape di Test_y:", y_test.shape)
 x_cleanedTest = removeColumnsWithMinMaxEqualTest(
     x_test, removed_columnsMaxMin)
 
-
+print(f"Nuovo dataset di training con dimensione: '{x_cleanedTrain.shape}'\n")
 print(f"Nuova lista del test set attributi con dimensione: '{
       x_cleanedTest.shape}'\n")
-
 
 clf1DecisionTreeMutualInfo = DecisionTreeMutualInfo(
     x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
 
 
-"""
 clf3KNNMutualInfo = KNNMutualInfo(
-    x_cleaned, y, script_path, x_test_cleaned, y_test)
+    x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
+
 
 clf2RandomForestMutualInfo = RandomForestMutualInfo(
-    x_cleaned, y, script_path, x_test_cleaned, y_test)
+    x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
 
-eclfMutualInfo = EnsembleMutualInfo(x_cleaned, y, script_path, x_test_cleaned, y_test,
+
+eclfMutualInfo = EnsembleMutualInfo(x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test,
                                     clf1DecisionTreeMutualInfo, clf2RandomForestMutualInfo, clf3KNNMutualInfo)
 
 
 clf1DecisionTreePCA = DecisionTreePCA(
-    x_cleaned, y, script_path, x_test_cleaned, y_test)
+    x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
+
 
 clf2RandomForestPCA = RandomForestPCA(
-    x_cleaned, y, script_path, x_test_cleaned, y_test)
+    x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
 
 
-clf3KNNPCA = KNNPCA(x_cleaned, y, script_path, x_test_cleaned, y_test)
+clf3KNNPCA = KNNPCA(x_cleanedTrain, y_train,
+                    script_path, x_cleanedTest, y_test)
 
-
-eclfPCA = EnsemblePCA(x_cleaned, y, script_path, x_test_cleaned, y_test,
+eclfPCA = EnsemblePCA(x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test,
                       clf1DecisionTreePCA, clf2RandomForestPCA, clf3KNNPCA)
-"""

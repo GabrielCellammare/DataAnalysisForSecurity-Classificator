@@ -12,9 +12,9 @@ def KNNPCA(x, y, script_path, x_test_cleaned, y_test):
     folds = 5
 
     pcaObj, pcalist, explained_variancePCA = pca(
-        x)  # valutare anche x_mutual info
+        x)
     print("\nExplained variance: ", explained_variancePCA, "\n")
-    XPCA = applyPCA(x, pcaObj, pcalist)  # Applicazione sull'intero dataset
+    XPCA = applyPCA(x, pcaObj, pcalist)
 
     ListXTrainPCA, ListXTestPCA, ListYTrainPCA, ListYTestPCA = stratifiedKFold(
         XPCA, y, folds)
@@ -36,15 +36,29 @@ def KNNPCA(x, y, script_path, x_test_cleaned, y_test):
         bestNPCA+1)]
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
-        x.iloc[:, :bestNPCA].shape}'\n")
+        x.iloc[:, 1:(
+            bestNPCA+1)].shape}'\n")
     print(f"Data Test: Nuova lista di attributi con dimensione: '{
         x_TestPCA_cleaned_feature.shape}'\n")
 
     y_pred = KNNPCA.predict(x_TestPCA_cleaned_feature)
-    target_names = ['class 0', 'class 1']
-    print(classification_report(y_test, y_pred, target_names=target_names))
+    target_names = ['class 0 - GoodWare ', 'class 1 - Malware']
 
-    script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
+    report = classification_report(y_test, y_pred, target_names=target_names)
+    print(report)
+
+    nome_file = "classification_report(KNN_PCA).txt"
+    script_pathClassification = script_path.parent.parent / \
+        "ClassificationReport" / "KNN"
+
+    percorso_file = os.path.join(script_pathClassification, nome_file)
+
+    # Apre il file in modalità scrittura
+    with open(percorso_file, 'w') as file:
+        # Scrive il classification report nel file
+        file.write(report)
+
+    script_pathFolder = script_path.parent.parent / "ConfusionMatrix" / "KNN"
     ConfusionMatrixBuilder(KNNPCA, y_pred, y_test,
                            script_pathFolder, "KNNPCA")
 

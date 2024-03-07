@@ -27,13 +27,11 @@ def EnsemblePCA(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, clf3):
           'best MI threshold', bestTHPCA, 'best N', bestNPCA, 'Best CV F', bestEvalPCA)
 
     ECLFPCA = EnsambleLearner(
-        XPCA.iloc[:, 1:(
-            bestNPCA+1)], y, clf1, clf2, clf3)
+        XPCA.iloc[:, :bestNPCA], y, clf1, clf2, clf3)
 
     X_TestPCA = applyPCA(x_test_cleaned, pcaObj, pcalist)
 
-    x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, 1:(
-        bestNPCA+1)]
+    x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, :bestNPCA]
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
         x.iloc[:, :bestNPCA].shape}'\n")
@@ -41,11 +39,25 @@ def EnsemblePCA(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, clf3):
         x_TestPCA_cleaned_feature.shape}'\n")
 
     y_pred = ECLFPCA.predict(x_TestPCA_cleaned_feature)
-    target_names = ['class 0', 'class 1']
-    print(classification_report(y_test, y_pred, target_names=target_names))
 
-    script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
+    target_names = ['class 0 - GoodWare ', 'class 1 - Malware']
+
+    report = classification_report(y_test, y_pred, target_names=target_names)
+    print(report)
+
+    nome_file = "classification_report(Ensamble_PCA).txt"
+    script_pathClassification = script_path.parent.parent / \
+        "ClassificationReport" / "Ensamble"
+
+    percorso_file = os.path.join(script_pathClassification, nome_file)
+
+    # Apre il file in modalità scrittura
+    with open(percorso_file, 'w') as file:
+        # Scrive il classification report nel file
+        file.write(report)
+
+    script_pathFolder = script_path.parent.parent / "ConfusionMatrix" / "Ensamble"
     ConfusionMatrixBuilder(ECLFPCA, y_pred, y_test,
-                           script_pathFolder, "EnsamblePCADecisionTreeRandomForestKNNSoftVoting")
+                           script_pathFolder, "EnsamblePCA")
 
     return ECLFPCA

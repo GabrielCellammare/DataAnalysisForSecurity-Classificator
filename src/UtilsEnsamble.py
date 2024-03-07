@@ -9,7 +9,7 @@ from UtilsFunctions import NumberOfTopPCSelect, topFeatureSelect
 
 def EnsambleLearner(x, y, clf1, clf2, clf3):
     eclf = VotingClassifier(
-        estimators=[('dt', clf1), ('rf', clf2), ('knn', clf3)], voting='soft')
+        estimators=[('dt', clf1), ('rf', clf2), ('knn', clf3)], voting='hard')
 
     eclf.fit(x, np.ravel(y))
     return eclf
@@ -23,7 +23,7 @@ def determineEnsamblekFoldConfigurationMutualInfo(ListXTrain, ListYTrain, ListXT
 
     # Crea il percorso completo al file utilizzando pathlib
     serialize_dir = script_path.parent.parent / \
-        "Serialized" / "BestConfigurationMutualInfoEnsembleSoftVoting.pkl"
+        "Serialized" / "BestConfigurationMutualInfoEnsemble.pkl"
 
     # Verifica se il file esiste
     if os.path.exists(serialize_dir):
@@ -94,7 +94,7 @@ def determineEnsamblekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, Li
 
     # Crea il percorso completo al file utilizzando pathlib
     serialize_dir = script_path.parent.parent / \
-        "Serialized" / "BestConfigurationPCAEnsembleSoftVoting.pkl"
+        "Serialized" / "BestConfigurationPCAEnsemble.pkl"
 
     # Verifica se il file esiste
     if os.path.exists(serialize_dir):
@@ -122,10 +122,8 @@ def determineEnsamblekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, Li
                 # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
                 for i in range(len(ListXTrain)):
                     # indicizzazione di tipo :n in Python seleziona gli elementi dall’indice 0 all’indice n-1
-                    x_train_feature_selected = ListXTrain[i].iloc[:, 1:(
-                        n+1)]
-                    x_test = ListXTest[i].iloc[:, 1:(
-                        n+1)]
+                    x_train_feature_selected = ListXTrain[i].iloc[:, :n]
+                    x_test = ListXTest[i].iloc[:, :n]
                     eclf = EnsambleLearner(
                         x_train_feature_selected, ListYTrain[i], clf1, clf2, clf3)
 
@@ -141,7 +139,7 @@ def determineEnsamblekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, Li
                     bestNPCA = n
 
                 if avg_fscore == bestEvalPCA:
-                    if (n < bestNPCA):  # ??
+                    if (n < bestNPCA):
                         bestEvalPCA = avg_fscore
                         bestTHPCA = thre
                         bestNPCA = n

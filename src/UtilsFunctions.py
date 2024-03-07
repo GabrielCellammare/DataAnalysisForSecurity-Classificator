@@ -137,16 +137,19 @@ def BoxPlotPreAnalysisData(x, y, boxPlotDir):
         os.remove(percorso_completo)
 
     x['Label'] = y['Label']
+
     for col in x.columns:
-        x.boxplot(column=col, by='Label')
-        # Aggiungi titoli e label per gli assi, se necessario
-        plt.title(f'Boxplot della colonna {col}')
-        plt.xlabel(goodMalware)
-        plt.ylabel('Dati')
-        file_name = os.path.join(
-            boxPlotDir, f'boxplot_{col}.png')
-        plt.savefig(file_name)
-        plt.close()
+        if (col != 'Label'):
+            x.boxplot(column=col, by='Label')
+            # Aggiungi titoli e label per gli assi, se necessario
+            plt.title(f'Boxplot della colonna {col}')
+            plt.xlabel(goodMalware)
+            plt.ylabel('Dati')
+            file_name = os.path.join(
+                boxPlotDir, f'boxplot_{col}.png')
+            plt.savefig(file_name)
+            plt.close()
+
     print("\nCompleted\n")
 
 
@@ -180,51 +183,49 @@ n=10 stamperà le prime 10 variabili significative e le ultime 10, escludendo qu
 """
 
 
-def BoxPlotAnalysisDataMutualInfo(x, y, boxPlotDir, mutualInfo={}, n_print=10):
+def BoxPlotAnalysisDataMutualInfo(x, y, boxPlotDir, mutualInfo, n_print=10):
     # Ottieni la lista dei file nella cartella
     print("\nSaving Mutual info variables Box Plot in 'BoxPlotMutualInfo' Folder...\n")
 
     boxPlotDirMutualInfoFirst = boxPlotDir / "MoreSignificant"
     boxPlotDirMutualInfoLast = boxPlotDir / "LessSignificant"
 
-    elenco_file = os.listdir(boxPlotDirMutualInfoFirst)
-
-    elenco_file = os.listdir(boxPlotDirMutualInfoLast)
-
-    i = 0
-    if (mutualInfo):
-        x['Label'] = y['Label']
-        for tupla in mutualInfo:
-            for col in x.columns:
-                if (tupla[0] == col and tupla[1] != 0):  # capire se va 0 considerato o meno
-                    if (i < n_print):
+    if (not os.listdir(boxPlotDirMutualInfoFirst)):
+        i = 0
+        if (mutualInfo):
+            x['Label'] = y['Label']
+            for tupla in mutualInfo:
+                for col in x.columns:
+                    # capire se va 0 considerato o meno
+                    if (tupla[0] == col and tupla[1] != 0):
+                        if (i < n_print):
+                            x.boxplot(column=col, by='Label')
+                            # Aggiungi titoli e label per gli assi, se necessario
+                            plt.title(f'Boxplot della colonna {col}')
+                            plt.xlabel(goodMalware)
+                            plt.ylabel('Dati')
+                            file_name = os.path.join(
+                                boxPlotDirMutualInfoFirst, f'boxplot_{col}.png')
+                            plt.savefig(file_name)
+                            plt.close()
+                            i += 1
+        i = 0
+        if (mutualInfo):
+            x['Label'] = y['Label']
+            for tupla in reversed(mutualInfo):
+                for col in x.columns:
+                    if (tupla[0] == col and tupla[1] != 0 and i < n_print):
                         x.boxplot(column=col, by='Label')
                         # Aggiungi titoli e label per gli assi, se necessario
                         plt.title(f'Boxplot della colonna {col}')
                         plt.xlabel(goodMalware)
                         plt.ylabel('Dati')
                         file_name = os.path.join(
-                            boxPlotDirMutualInfoFirst, f'boxplot_{col}.png')
+                            boxPlotDirMutualInfoLast, f'boxplot_{col}.png')
                         plt.savefig(file_name)
                         plt.close()
                         i += 1
-    i = 0
-    if (mutualInfo):
-        x['Label'] = y['Label']
-        for tupla in reversed(mutualInfo):
-            for col in x.columns:
-                if (tupla[0] == col and tupla[1] != 0 and i < n_print):
-                    x.boxplot(column=col, by='Label')
-                    # Aggiungi titoli e label per gli assi, se necessario
-                    plt.title(f'Boxplot della colonna {col}')
-                    plt.xlabel(goodMalware)
-                    plt.ylabel('Dati')
-                    file_name = os.path.join(
-                        boxPlotDirMutualInfoLast, f'boxplot_{col}.png')
-                    plt.savefig(file_name)
-                    plt.close()
-                    i += 1
-    print("\nCompleted!\n")
+        print("\nCompleted!\n")
 
 
 """

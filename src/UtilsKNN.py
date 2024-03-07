@@ -151,7 +151,7 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
                         best_KneighborsPCA = neighbor
 
                     if avg_fscore == bestEvalPCA:
-                        if (n < bestNPCA):  # ??
+                        if (n < bestNPCA):
                             bestEvalPCA = avg_fscore
                             bestTHPCA = thre
                             bestNPCA = n

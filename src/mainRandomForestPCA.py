@@ -27,25 +27,35 @@ def RandomForestPCA(x, y, script_path, x_test_cleaned, y_test):
           "\nbest_randPCA: ", best_randPCA, "\nbest_bootstrap_sPCA: ", best_bootstrap_sPCA)
 
     RFPCA = randomForestLearner(
-        XPCA.iloc[:, 1:(
-            bestNPCA+1)], y, best_n_treePCA, best_criterionPCA, best_randPCA, best_bootstrap_sPCA)
+        XPCA.iloc[:, :bestNPCA], y, best_n_treePCA, best_criterionPCA, best_randPCA, best_bootstrap_sPCA)
 
     X_TestPCA = applyPCA(x_test_cleaned, pcaObj, pcalist)
 
-    x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, 1:(
-        bestNPCA+1)]
+    x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, :bestNPCA]
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
-        x.iloc[:, 1:(
-            bestNPCA+1)].shape}'\n")
+        x.iloc[:, :bestNPCA].shape}'\n")
     print(f"Data Test: Nuova lista di attributi con dimensione: '{
         x_TestPCA_cleaned_feature.shape}'\n")
 
     y_pred = RFPCA.predict(x_TestPCA_cleaned_feature)
-    target_names = ['class 0', 'class 1']
-    print(classification_report(y_test, y_pred, target_names=target_names))
+    target_names = ['class 0 - GoodWare ', 'class 1 - Malware']
 
-    script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
+    report = classification_report(y_test, y_pred, target_names=target_names)
+    print(report)
+
+    nome_file = "classification_report(RandomForest_PCA).txt"
+    script_pathClassification = script_path.parent.parent / \
+        "ClassificationReport" / "RandomForest"
+
+    percorso_file = os.path.join(script_pathClassification, nome_file)
+
+    # Apre il file in modalità scrittura
+    with open(percorso_file, 'w') as file:
+        # Scrive il classification report nel file
+        file.write(report)
+
+    script_pathFolder = script_path.parent.parent / "ConfusionMatrix" / "RandomForest"
     ConfusionMatrixBuilder(RFPCA, y_pred, y_test,
                            script_pathFolder, "RandomForestPCA")
 

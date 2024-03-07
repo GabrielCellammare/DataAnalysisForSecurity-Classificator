@@ -12,9 +12,10 @@ def DecisionTreePCA(x, y, script_path, x_test_cleaned, y_test):
     folds = 5
 
     pcaObj, pcalist, explained_variancePCA = pca(
-        x)  # valutare anche x_mutual info
+        x)
     print("\nExplained variance: ", explained_variancePCA, "\n")
-    XPCA = applyPCA(x, pcaObj, pcalist)  # Applicazione sull'intero dataset
+    # Applicazione sull'intero dataset di training
+    XPCA = applyPCA(x, pcaObj, pcalist)
 
     ListXTrainPCA, ListXTestPCA, ListYTrainPCA, ListYTestPCA = stratifiedKFold(
         XPCA, y, folds)
@@ -30,6 +31,7 @@ def DecisionTreePCA(x, y, script_path, x_test_cleaned, y_test):
         XPCA.iloc[:,
                   :bestNPCA], y, bestCriterionPCA)
     script_pathTreeFolder = script_path.parent.parent / "TreeFigOutput"
+
     showTree(DTPCA, script_pathTreeFolder, "DecisionTreePCA")
 
     X_TestPCA = applyPCA(x_test_cleaned, pcaObj, pcalist)
@@ -43,10 +45,23 @@ def DecisionTreePCA(x, y, script_path, x_test_cleaned, y_test):
         x_TestPCA_cleaned_feature.shape}'\n")
 
     y_pred = DTPCA.predict(x_TestPCA_cleaned_feature)
-    target_names = ['class 0', 'class 1']
-    print(classification_report(y_test, y_pred, target_names=target_names))
+    target_names = ['class 0 - GoodWare ', 'class 1 - Malware']
 
-    script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
+    report = classification_report(y_test, y_pred, target_names=target_names)
+    print(report)
+
+    nome_file = "classification_report(DecisionTree_PCA).txt"
+    script_pathClassification = script_path.parent.parent / \
+        "ClassificationReport" / "DecisionTree"
+
+    percorso_file = os.path.join(script_pathClassification, nome_file)
+
+    # Apre il file in modalità scrittura
+    with open(percorso_file, 'w') as file:
+        # Scrive il classification report nel file
+        file.write(report)
+
+    script_pathFolder = script_path.parent.parent / "ConfusionMatrix" / "DecisionTree"
     ConfusionMatrixBuilder(DTPCA, y_pred, y_test,
                            script_pathFolder, "DecisionTreePCA")
 

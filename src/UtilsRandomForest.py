@@ -24,7 +24,7 @@ If bootstrap is True, the number of samples to draw from X to train each base es
 def randomForestLearner(x, y, n_tree, c, rand, bootstrap_s):
     rlf = RandomForestClassifier(n_estimators=n_tree, criterion=c,
                                  max_features=rand, max_samples=bootstrap_s, random_state=seed)
-
+    # Min samples risultati inferiori
     rlf.fit(x, np.ravel(y))
 
     return rlf
@@ -181,11 +181,9 @@ def determineRFkFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, ListYTes
                             if (n > 0):
                                 # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
                                 for i in range(len(ListXTrain)):
-                                    x_train_feature_selected = ListXTrain[i].iloc[:, 1:(
-                                        n+1)]
+                                    x_train_feature_selected = ListXTrain[i].iloc[:, :n]
 
-                                    x_test = ListXTest[i].iloc[:, 1:(
-                                        n+1)]
+                                    x_test = ListXTest[i].iloc[:, :n]
 
                                     rlf = randomForestLearner(
                                         x_train_feature_selected, ListYTrain[i], n_tree, criteria, rand, b_size)

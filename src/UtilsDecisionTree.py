@@ -163,10 +163,12 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
                     # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
                     for i in range(len(ListXTrain)):
                         # indicizzazione di tipo :n in Python seleziona gli elementi dall’indice 0 all’indice n-1
-                        x_train_feature_selected = ListXTrain[i].iloc[:, 1:(
-                            n+1)]
+                        x_train_feature_selected = ListXTrain[i].iloc[:, :n]
+                        x_test = ListXTest[i].iloc[:, :n]
+                        """
                         x_test = ListXTest[i].iloc[:, 1:(
                             n+1)]
+                        """
                         clf = decisionTreeLearner(
                             x_train_feature_selected, ListYTrain[i], criteria)
 
@@ -183,7 +185,7 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
                         bestNPCA = n
 
                     if avg_fscore == bestEvalPCA:
-                        if (n < bestNPCA):  # ??
+                        if (n < bestNPCA):
                             bestEvalPCA = avg_fscore
                             best_criterionPCA = criteria
                             bestTHPCA = thre

@@ -75,10 +75,23 @@ def RandomForestMutualInfo(x, y, script_path, x_test_cleaned, y_test):
         x_test_cleaned_feature.shape}'\n")
 
     y_pred = RF.predict(x_test_cleaned_feature)
-    target_names = ['class 0', 'class 1']
-    print(classification_report(y_test, y_pred, target_names=target_names))
+    target_names = ['class 0 - GoodWare ', 'class 1 - Malware']
 
-    script_pathFolder = script_path.parent.parent / "ConfusionMatrix"
+    report = classification_report(y_test, y_pred, target_names=target_names)
+    print(report)
+
+    nome_file = "classification_report(RandomForest_MutualInfo).txt"
+    script_pathClassification = script_path.parent.parent / \
+        "ClassificationReport" / "RandomForest"
+
+    percorso_file = os.path.join(script_pathClassification, nome_file)
+
+    # Apre il file in modalità scrittura
+    with open(percorso_file, 'w') as file:
+        # Scrive il classification report nel file
+        file.write(report)
+
+    script_pathFolder = script_path.parent.parent / "ConfusionMatrix" / "RandomForest"
     ConfusionMatrixBuilder(
         RF, y_pred, y_test, script_pathFolder, "RandomForestMutualInfo")
 

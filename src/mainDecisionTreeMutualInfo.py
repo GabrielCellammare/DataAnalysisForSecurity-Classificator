@@ -26,7 +26,7 @@ def DecisionTreeMutualInfo(x, y, script_path, x_test_cleaned, y_test):
         boxPlotDirMutualInfo = script_path.parent.parent / "BoxPlotMutualInfo"
 
         BoxPlotAnalysisDataMutualInfo(
-            x, y, boxPlotDirMutualInfo, rank)
+            x, y, boxPlotDirMutualInfo, rank, 10)
 
     minThreshold = 0
     maxMutualInfo = 0.0
@@ -80,7 +80,7 @@ def DecisionTreeMutualInfo(x, y, script_path, x_test_cleaned, y_test):
     report = classification_report(y_test, y_pred, target_names=target_names)
     print(report)
 
-    nome_file = "classification_report(DecisionTreeMutualInfo).txt"
+    nome_file = "classification_report(DecisionTree_MutualInfo).txt"
     script_pathClassification = script_path.parent.parent / \
         "ClassificationReport" / "DecisionTree"
 
