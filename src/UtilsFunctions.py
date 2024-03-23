@@ -271,8 +271,8 @@ def applyPCA(X, pca, pcalist):
     transformed = pca.transform(X)
     # Crea un nuovo DataFrame con le componenti principali
     df_pca = pd.DataFrame(transformed, columns=pcalist)
-    return df_pca
     print("\nCompleted!\n")
+    return df_pca
 
 
 "Selezione di Alcune delle PC la cui somma della varianza superi un determinato threesold"

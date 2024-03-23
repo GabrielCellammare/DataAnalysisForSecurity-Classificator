@@ -1,0 +1,1 @@
+{'bestTHPCA': 1.0, 'bestNPCA': 2326, 'bestEvalPCA': 0.9099474627605055, 'best_KneighborsPCA': 1}
