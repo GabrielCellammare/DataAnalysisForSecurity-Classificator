@@ -1,4 +1,6 @@
-from UtilsFunctions import loadData, removeColumnsWithMinMaxEqual, removeColumnsWithMinMaxEqualTest
+from UtilsFunctions import loadData, removeColumnsWithMinMaxEqual, removeColumnsWithMinMaxEqualTest, stratifiedKFold
+from mainDecisionTreeMutualInfoPCA import DecisionTreeMutualInfoPCA
+from mainRandomForestMutualInfoPCA import RandomForestMutualInfoPCA
 from mainDescribeData import DescribeData
 from mainDecisionTreeMutualInfo import DecisionTreeMutualInfo
 from mainDecisionTreePCA import DecisionTreePCA
@@ -63,15 +65,19 @@ print(f"Nuovo dataset di training con dimensione: '{x_cleanedTrain.shape}'\n")
 print(f"Nuova lista del test set attributi con dimensione: '{
       x_cleanedTest.shape}'\n")
 
+
+ListXTrain, ListXTest, ListYTrain, ListYTest = stratifiedKFold(
+    x_cleanedTrain, y_train, 5)
+
+"""
 clf1DecisionTreeMutualInfo = DecisionTreeMutualInfo(
+    x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
+
+clf2RandomForestMutualInfo = RandomForestMutualInfo(
     x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
 
 
 clf3KNNMutualInfo = KNNMutualInfo(
-    x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
-
-
-clf2RandomForestMutualInfo = RandomForestMutualInfo(
     x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
 
 
@@ -92,3 +98,11 @@ clf3KNNPCA = KNNPCA(x_cleanedTrain, y_train,
 
 eclfPCA = EnsemblePCA(x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test,
                       clf1DecisionTreePCA, clf2RandomForestPCA, clf3KNNPCA)
+
+
+clfMixedDecisionTreeMutualInfoPCA = DecisionTreeMutualInfoPCA(
+    x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
+"""
+
+clfMixedRandomForestMutualInfoPCA = RandomForestMutualInfoPCA(
+    x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test)
