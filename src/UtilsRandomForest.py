@@ -107,7 +107,7 @@ def determineRFkFoldConfigurationMutualInfo(ListXTrain, ListYTrain, ListXTest, L
                                     best_bootstrap_s = b_size
 
                             if avg_fscore == best_fscore:
-                                if (len(selectedFeatures) < len(bestN)):  # ??
+                                if (len(selectedFeatures) < len(bestN)):
                                     best_fscore = avg_fscore
                                     best_criterion = criteria
                                     best_TH = thre
@@ -225,78 +225,3 @@ def determineRFkFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, ListYTes
         print("\nCompleted!\n")
 
         return best_criterionPCA, best_THPCA, bestNPCA, best_fscorePCA, best_n_treePCA, best_randPCA, best_bootstrap_sPCA
-
-
-def determineRFkFoldConfigurationMixed(ListXTrain, ListYTrain, ListXTest, ListYTest):
-    print("\nComputing best configuration with PCA and Mutual Info on Random Forest...\n")
-
-    script_path = Path(__file__)
-
-    # Crea il percorso completo al file utilizzando pathlib
-    serialize_dir = script_path.parent.parent / \
-        "Serialized" / "BestConfigurationMutualInfoPCARandomForest.pkl"
-
-    # Verifica se il file esiste
-    if os.path.exists(serialize_dir):
-        # Se il file esiste, leggi i parametri
-        with open(serialize_dir, "rb") as f:
-            bestConfiguration = pickle.load(f)
-
-        best_criterionMixed = bestConfiguration["best_criterionMixed"]
-        best_fscoreMixed = bestConfiguration["best_fscoreMixed"]
-        best_n_treeMixed = bestConfiguration["best_n_treeMixed"]
-        best_randMixed = bestConfiguration["best_randMixed"]
-        best_bootstrap_sMixed = bestConfiguration["best_bootstrap_sMixed"]
-
-        print("\nCompleted!\n")
-        return best_criterionMixed, best_fscoreMixed, best_n_treeMixed, best_randMixed, best_bootstrap_sMixed
-
-    else:
-
-        best_criterionMixed = None
-        best_fscoreMixed = 0
-        best_n_treeMixed = 0
-        best_randMixed = 0
-        best_bootstrap_sMixed = 0
-
-        criterion = ['gini', 'entropy']
-        randomization = ['sqrt', 'log2']
-        number_of_trees = [10, 20, 30]
-        bootstrap_size = [0.7, 0.8, 0.9]
-
-        for criteria in criterion:
-            for rand in randomization:
-                for n_tree in number_of_trees:
-                    for b_size in bootstrap_size:
-                        avg_fscore = 0
-                        fscores = []
-                        # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
-                        for i in range(len(ListXTrain)):
-
-                            rlf = randomForestLearner(
-                                ListXTrain[i], ListYTrain[i], n_tree, criteria, rand, b_size)
-
-                            y_pred = rlf.predict(ListXTest[i])
-                            fscores.append(
-                                f1_score(ListYTest[i], y_pred))
-
-                        if (len(fscores) > 1):
-                            avg_fscore = np.mean(fscores)
-                            print(f"Average F1 score: '{avg_fscore}'")
-                            if avg_fscore > best_fscoreMixed:
-                                best_fscoreMixed = avg_fscore
-                                best_criterionMixed = criteria
-                                best_n_treeMixed = n_tree
-                                best_randMixed = rand
-                                best_bootstrap_sMixed = b_size
-
-        # Salva le variabili in un dizionario
-        BestConfiguration = {"best_criterionMixed": best_criterionMixed, "best_fscoreMixed": best_fscoreMixed, "best_n_treeMixed": best_n_treeMixed,
-                             "best_randMixed": best_randMixed, "best_bootstrap_sMixed": best_bootstrap_sMixed}
-
-        # Salva il dizionario in un file usando pickle
-        with open(serialize_dir, "wb") as f:
-            pickle.dump(BestConfiguration, f)
-        print("\nCompleted!\n")
-
-        return best_criterionMixed, best_fscoreMixed, best_n_treeMixed, best_randMixed, best_bootstrap_sMixed

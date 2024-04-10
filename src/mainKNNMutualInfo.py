@@ -17,15 +17,15 @@ def KNNMutualInfo(x, y, script_path, x_test_cleaned, y_test):
     else:
         rank = mutualInfoRank(x, y)
         MutualInfoTraining = rank
-        print(f"X mutual_info: '{rank}'\n")
+        # print(f"X mutual_info: '{rank}'\n")
         # Salva il dizionario in un file usando pickle
         with open(serialize_dir, "wb") as f:
             pickle.dump(MutualInfoTraining, f)
 
         boxPlotDirMutualInfo = script_path.parent.parent / "BoxPlotMutualInfo"
-
-        BoxPlotAnalysisDataMutualInfo(
-            x, y, boxPlotDirMutualInfo, rank, 10)
+        if (not os.listdir(boxPlotDirMutualInfo)):
+            BoxPlotAnalysisDataMutualInfo(
+                x, y, boxPlotDirMutualInfo, rank, 10)
 
     minThreshold = 0
     maxMutualInfo = 0.0
@@ -34,15 +34,16 @@ def KNNMutualInfo(x, y, script_path, x_test_cleaned, y_test):
         if (key[1] >= maxMutualInfo):
             maxMutualInfo = key[1]
 
-    print(f"Max mutual info = '{maxMutualInfo}'")
+    # print(f"Max mutual info = '{maxMutualInfo}'")
 
-    stepThreshold = 0.05
-
+    stepThreshold = 0.02
     maxThreshold = maxMutualInfo+stepThreshold
+
     folds = 5
     ListXTrain, ListXTest, ListYTrain, ListYTest = stratifiedKFold(
         x, y, folds)
 
+    """
     print("\n\nListXTrain")
     printFolds(ListXTrain)
     print("\n\nListYTrain")
@@ -51,12 +52,13 @@ def KNNMutualInfo(x, y, script_path, x_test_cleaned, y_test):
     printFolds(ListXTest)
     print("\n\nListYTest")
     printFolds(ListYTest)
+    """
 
     best_TH, bestN, best_fscore, best_Kneighbors = determineKNNkFoldConfigurationMutualInfo(
         ListXTrain, ListYTrain, ListXTest, ListYTest, rank, minThreshold, maxThreshold, stepThreshold)
 
-    print('Feature Ranking by MI:\n',
-          'Best Neighbours= ', best_Kneighbors, "\n"
+    print('Feature Ranking by MI on KNN:\n',
+          'Best Neighbours = ', best_Kneighbors, "\n"
           'best MI threshold = ', best_TH, "\n", 'best N = ', bestN, "\n", 'Best CV F = ', best_fscore)
 
     # Prendo le feature migliori (Mutual info)

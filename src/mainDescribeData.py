@@ -3,8 +3,8 @@ import os
 
 
 def DescribeData(x, y, script_path):
-    print("\nShape di x:", x.shape)
-    print("\nShape di y:", y.shape)
+    print("\nShape di x after removing min=max:", x.shape)
+    print("\nShape di y after removing min=max:", y.shape)
 
     # Visualizzazione di alcune statistiche riguardo le colonne
     preElaborationData(x)

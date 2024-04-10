@@ -22,7 +22,7 @@ def loadData(pathTrain):
 
 
 """
-Funzione che itera attraverso le colonne del DataFrame "x" e per ogni colonna estrae il conenuto
+Funzione che itera attraverso le colonne del DataFrame "x" e per ogni colonna estrae il contenuto
 assegnandolo alla variabile col_data. Con il metodo col_data.describe() vengono poi calcolate diverse
 statistiche come conteggio, media, deviazione standard, minimo, massimo e quartili.
 Viene restituito un array
@@ -255,7 +255,6 @@ def pca(X):
     pca.fit(X)
     # Nome delle nuove feature del tipo pca0...pcan
     feature_names = pca.get_feature_names_out()
-    print(feature_names)
     print("\nCompleted!\n")
     return pca, feature_names, pca.explained_variance_ratio_
 
@@ -317,17 +316,29 @@ def stratifiedKFold(X, Y, folds=5):
         set1 = set(indici_lista_i)
         set2 = set(indici_lista_i2)
         intersezione = set1 & set2
+        """
         if intersezione:
             print("Le liste hanno un'intersezione:", intersezione)
         else:
             print("Le liste non hanno un'intersezione.")
+        """
 
     return ListXTrain, ListXTest, ListYTrain, ListYTest
+
+
+"""
+Funzione che stamperà in maniera predefinita tutti i fold
+"""
 
 
 def printFolds(list):
     for i in range(len(list)):
         print(f"Fold {i} " + str(list[i].shape) + "\n")
+
+
+"""
+Funzione che stampa la matrice di confusione e la salva con uno specifico nome in una specifica cartella
+"""
 
 
 def ConfusionMatrixBuilder(clf, y_pred, y_test, script_pathFolder, typeC):

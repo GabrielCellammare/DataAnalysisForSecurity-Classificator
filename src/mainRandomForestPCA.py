@@ -13,7 +13,7 @@ def RandomForestPCA(x, y, script_path, x_test_cleaned, y_test):
 
     pcaObj, pcalist, explained_variancePCA = pca(
         x)
-    print("\nExplained variance: ", explained_variancePCA, "\n")
+    #print("\nExplained variance: ", explained_variancePCA, "\n")
     XPCA = applyPCA(x, pcaObj, pcalist)  # Applicazione sull'intero dataset
 
     ListXTrainPCA, ListXTestPCA, ListYTrainPCA, ListYTestPCA = stratifiedKFold(

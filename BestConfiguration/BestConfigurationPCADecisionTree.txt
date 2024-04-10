@@ -1,1 +1,0 @@
-{'best_criterionPCA': 'entropy', 'bestTHPCA': 1.0, 'bestNPCA': 2326, 'bestEvalPCA': 0.8327404551160267}

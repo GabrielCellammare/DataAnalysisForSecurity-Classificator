@@ -13,7 +13,7 @@ def DecisionTreePCA(x, y, script_path, x_test_cleaned, y_test):
 
     pcaObj, pcalist, explained_variancePCA = pca(
         x)
-    print("\nExplained variance: ", explained_variancePCA, "\n")
+    # print("\nExplained variance: ", explained_variancePCA, "\n")
     # Applicazione sull'intero dataset di training
     XPCA = applyPCA(x, pcaObj, pcalist)
 
@@ -25,7 +25,7 @@ def DecisionTreePCA(x, y, script_path, x_test_cleaned, y_test):
 
     print('Feature Ranking by PCA:', 'Best criterion', bestCriterionPCA,
 
-          'best MI threshold', bestTHPCA, 'best N', bestNPCA, 'Best CV F', bestEvalPCA)
+          'best PCA threshold', bestTHPCA, 'best N', bestNPCA, 'Best CV F', bestEvalPCA)
 
     DTPCA = decisionTreeLearner(
         XPCA.iloc[:,

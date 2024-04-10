@@ -13,7 +13,7 @@ def EnsemblePCA(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, clf3):
 
     pcaObj, pcalist, explained_variancePCA = pca(
         x)  # valutare anche x_mutual info
-    print("\nExplained variance: ", explained_variancePCA, "\n")
+    # print("\nExplained variance: ", explained_variancePCA, "\n")
     XPCA = applyPCA(x, pcaObj, pcalist)  # Applicazione sull'intero dataset
 
     ListXTrainPCA, ListXTestPCA, ListYTrainPCA, ListYTestPCA = stratifiedKFold(

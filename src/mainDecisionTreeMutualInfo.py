@@ -18,15 +18,16 @@ def DecisionTreeMutualInfo(x, y, script_path, x_test_cleaned, y_test):
     else:
         rank = mutualInfoRank(x, y)
         MutualInfoTraining = rank
-        print(f"X mutual_info: '{rank}'\n")
+        # print(f"X mutual_info: '{rank}'\n")
         # Salva il dizionario in un file usando pickle
         with open(serialize_dir, "wb") as f:
             pickle.dump(MutualInfoTraining, f)
 
         boxPlotDirMutualInfo = script_path.parent.parent / "BoxPlotMutualInfo"
 
-        BoxPlotAnalysisDataMutualInfo(
-            x, y, boxPlotDirMutualInfo, rank, 10)
+        if (not os.listdir(boxPlotDirMutualInfo)):
+            BoxPlotAnalysisDataMutualInfo(
+                x, y, boxPlotDirMutualInfo, rank, 10)
 
     minThreshold = 0
     maxMutualInfo = 0.0
@@ -35,16 +36,17 @@ def DecisionTreeMutualInfo(x, y, script_path, x_test_cleaned, y_test):
         if (key[1] >= maxMutualInfo):
             maxMutualInfo = key[1]
 
-    print(f"Max mutual info = '{maxMutualInfo}'\n")
+    # print(f"Max mutual info = '{maxMutualInfo}'\n")
 
     # Costante prefissata
-    stepThreshold = 0.05
-
+    stepThreshold = 0.02
     maxThreshold = maxMutualInfo+stepThreshold
+
     folds = 5
     ListXTrain, ListXTest, ListYTrain, ListYTest = stratifiedKFold(
         x, y, folds)
 
+    """
     print("\n\nListXTrain")
     printFolds(ListXTrain)
     print("\n\nListYTrain")
@@ -53,6 +55,7 @@ def DecisionTreeMutualInfo(x, y, script_path, x_test_cleaned, y_test):
     printFolds(ListXTest)
     print("\n\nListYTest")
     printFolds(ListYTest)
+    """
 
     bestCriterion, bestTH, bestN, bestEval = determineDecisionTreekFoldConfigurationMutualInfo(
         ListXTrain, ListYTrain, ListXTest, ListYTest, rank, minThreshold, maxThreshold, stepThreshold)
@@ -68,7 +71,6 @@ def DecisionTreeMutualInfo(x, y, script_path, x_test_cleaned, y_test):
     showTree(DT, script_pathTreeFolder, "DecisionTreeMutualInfo")
 
     x_test_cleaned_feature = x_test_cleaned.loc[:, toplist]
-
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
         x.loc[:, toplist].shape}'\n")
     print(f"Data Test: Nuova lista di attributi con dimensione: '{

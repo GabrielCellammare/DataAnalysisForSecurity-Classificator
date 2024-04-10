@@ -16,7 +16,7 @@ def EnsembleMutualInfo(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, cl
     else:
         rank = mutualInfoRank(x, y)
         MutualInfoTraining = rank
-        print(f"X mutual_info: '{rank}'\n")
+        # print(f"X mutual_info: '{rank}'\n")
         # Salva il dizionario in un file usando pickle
         with open(serialize_dir, "wb") as f:
             pickle.dump(MutualInfoTraining, f)
@@ -31,7 +31,7 @@ def EnsembleMutualInfo(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, cl
         if (key[1] >= maxMutualInfo):
             maxMutualInfo = key[1]
 
-    print(f"Max mutual info = '{maxMutualInfo}'")
+    # print(f"Max mutual info = '{maxMutualInfo}'")
 
     stepThreshold = 0.05
 
@@ -40,6 +40,7 @@ def EnsembleMutualInfo(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, cl
     ListXTrain, ListXTest, ListYTrain, ListYTest = stratifiedKFold(
         x, y, folds)
 
+    """
     print("\n\nListXTrain")
     printFolds(ListXTrain)
     print("\n\nListYTrain")
@@ -48,6 +49,7 @@ def EnsembleMutualInfo(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, cl
     printFolds(ListXTest)
     print("\n\nListYTest")
     printFolds(ListYTest)
+    """
 
     bestTH, bestN, bestEval = determineEnsamblekFoldConfigurationMutualInfo(
         ListXTrain, ListYTrain, ListXTest, ListYTest, rank, minThreshold, maxThreshold, stepThreshold, clf1, clf2, clf3)

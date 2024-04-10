@@ -7,10 +7,14 @@ import numpy as np
 from sklearn.metrics import f1_score
 import pickle
 from pathlib import Path
-from UtilsFunctions import topFeatureSelect, NumberOfTopPCSelect
+from UtilsFunctions import applyPCA, pca, topFeatureSelect, NumberOfTopPCSelect
 
 seed = 42
 np.random.seed(seed)
+
+"""
+Funzione che restituisce un oggetto decision tree
+"""
 
 
 def decisionTreeLearner(X, Y, c):
@@ -19,9 +23,10 @@ def decisionTreeLearner(X, Y, c):
     # Tree_ dentro c'è l'albero addestrata
     clf.fit(X, Y)
 
-    print(f"Number of nodes: {clf.tree_.node_count}")
-    print(f"Number of leaves: {clf.get_n_leaves()} ")
+    #print(f"Number of nodes: {clf.tree_.node_count}")
+    #print(f"Number of leaves: {clf.get_n_leaves()} ")
     # Return the number of leaves of the decision tree.)
+
     return clf
 
 
@@ -201,63 +206,3 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
         print("\nCompleted!\n")
 
         return best_criterionPCA, bestTHPCA, bestNPCA, bestEvalPCA
-
-
-def determineDecisionTreekFoldMixed(ListXTrain, ListYTrain, ListXTest, ListYTest):
-
-    print("\nComputing best configuration with Mutual Info on Decision Tree and PCA...\n")
-
-    script_path = Path(__file__)
-
-    # Crea il percorso completo al file utilizzando pathlib
-    serialize_dir = script_path.parent.parent / \
-        "Serialized" / "BestConfigurationMutualInfoPCADecisionTree.pkl"
-
-    # Verifica se il file esiste
-    if os.path.exists(serialize_dir):
-        # Se il file esiste, leggi i parametri
-        with open(serialize_dir, "rb") as f:
-            bestConfiguration = pickle.load(f)
-
-        best_criterion = bestConfiguration["best_criterion"]
-        best_fscore = bestConfiguration["best_fscore"]
-
-        print("\nCompleted!\n")
-        return best_criterion, best_fscore
-
-    else:
-
-        best_criterion = None
-        best_fscore = 0
-
-        criterion = ['gini', 'entropy']
-
-        for criteria in criterion:
-
-            avg_fscore = 0
-            fscores = []
-            # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
-            for i in range(len(ListXTrain)):
-                clf = decisionTreeLearner(
-                    ListXTrain[i], ListYTrain[i], criteria)
-
-                y_pred = clf.predict(ListXTest[i])
-                fscores.append(f1_score(ListYTest[i], y_pred))
-
-            if (len(fscores) > 1):
-                avg_fscore = np.mean(fscores)
-                print(f"Average F1 score: '{avg_fscore}'")
-                if avg_fscore > best_fscore:
-                    best_fscore = avg_fscore
-                    best_criterion = criteria
-
-        # Salva le variabili in un dizionario
-        BestConfiguration = {
-            "best_criterion": best_criterion, "best_fscore": best_fscore}
-
-        # Salva il dizionario in un file usando pickle
-        with open(serialize_dir, "wb") as f:
-            pickle.dump(BestConfiguration, f)
-        print("\nCompleted!\n")
-
-        return best_criterion, best_fscore
