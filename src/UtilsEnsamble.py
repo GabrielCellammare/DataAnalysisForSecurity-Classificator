@@ -17,7 +17,7 @@ def EnsambleLearner(x, y, clf1, clf2, clf3):
 
 def determineEnsamblekFoldConfigurationMutualInfo(ListXTrain, ListYTrain, ListXTest, ListYTest, rank, min_t, max_t, step, clf1, clf2, clf3):
 
-    print("\nComputing best configuration with Mutual Info on Ensamble with DecisionTree,RandomForest and Knn...\n")
+    print("\nComputing best configuration with Mutual Info on Ensamble with DecisionTree, RandomForest and Knn...\n")
 
     script_path = Path(__file__)
 
@@ -63,16 +63,16 @@ def determineEnsamblekFoldConfigurationMutualInfo(ListXTrain, ListYTrain, ListXT
             if (len(fscores) > 1):
                 avg_fscore = np.mean(fscores)
                 print(f"Average F1 score: '{avg_fscore}'")
+                if avg_fscore == best_fscore:
+                    if (len(selectedFeatures) < len(bestN)):
+                        best_fscore = avg_fscore
+                        best_TH = thre
+                        bestN = selectedFeatures
+
                 if avg_fscore > best_fscore:
                     best_fscore = avg_fscore
                     best_TH = thre
                     bestN = selectedFeatures
-
-                if avg_fscore == best_fscore:
-                    if (len(selectedFeatures) < len(bestN)):  # ??
-                        best_fscore = avg_fscore
-                        best_TH = thre
-                        bestN = selectedFeatures
 
         # Salva le variabili in un dizionario
         BestConfiguration = {"best_TH": best_TH,
@@ -133,16 +133,17 @@ def determineEnsamblekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, Li
             if (len(fscores) > 1):
                 avg_fscore = np.mean(fscores)
                 print(f"Average F1 score: '{avg_fscore}'")
-                if avg_fscore > bestEvalPCA:
-                    bestEvalPCA = avg_fscore
-                    bestTHPCA = thre
-                    bestNPCA = n
 
                 if avg_fscore == bestEvalPCA:
                     if (n < bestNPCA):
                         bestEvalPCA = avg_fscore
                         bestTHPCA = thre
                         bestNPCA = n
+
+                if avg_fscore > bestEvalPCA:
+                    bestEvalPCA = avg_fscore
+                    bestTHPCA = thre
+                    bestNPCA = n
 
         # Salva le variabili in un dizionario
         BestConfiguration = {"bestTHPCA": bestTHPCA,

@@ -23,8 +23,8 @@ def decisionTreeLearner(X, Y, c):
     # Tree_ dentro c'è l'albero addestrata
     clf.fit(X, Y)
 
-    #print(f"Number of nodes: {clf.tree_.node_count}")
-    #print(f"Number of leaves: {clf.get_n_leaves()} ")
+    # print(f"Number of nodes: {clf.tree_.node_count}")
+    # print(f"Number of leaves: {clf.get_n_leaves()} ")
     # Return the number of leaves of the decision tree.)
 
     return clf
@@ -102,18 +102,18 @@ def determineDecisionTreekFoldConfigurationMutualInfo(ListXTrain, ListYTrain, Li
                 if (len(fscores) > 1):
                     avg_fscore = np.mean(fscores)
                     print(f"Average F1 score: '{avg_fscore}'")
-                    if avg_fscore > best_fscore:
-                        best_fscore = avg_fscore
-                        best_criterion = criteria
-                        best_TH = thre
-                        bestN = selectedFeatures
-
                     if avg_fscore == best_fscore:
                         if (len(selectedFeatures) < len(bestN)):  # Criterio aggiuntivo
                             best_fscore = avg_fscore
                             best_criterion = criteria
                             best_TH = thre
                             bestN = selectedFeatures
+
+                    if avg_fscore > best_fscore:
+                        best_fscore = avg_fscore
+                        best_criterion = criteria
+                        best_TH = thre
+                        bestN = selectedFeatures
 
         # Salva le variabili in un dizionario
         BestConfiguration = {"best_criterion": best_criterion, "best_TH": best_TH,
@@ -183,11 +183,6 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
                 if (len(fscores) > 1):
                     avg_fscore = np.mean(fscores)
                     print(f"Average F1 score: '{avg_fscore}'")
-                    if avg_fscore > bestEvalPCA:
-                        bestEvalPCA = avg_fscore
-                        best_criterionPCA = criteria
-                        bestTHPCA = thre
-                        bestNPCA = n
 
                     if avg_fscore == bestEvalPCA:
                         if (n < bestNPCA):
@@ -195,6 +190,12 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
                             best_criterionPCA = criteria
                             bestTHPCA = thre
                             bestNPCA = n
+
+                    if avg_fscore > bestEvalPCA:
+                        bestEvalPCA = avg_fscore
+                        best_criterionPCA = criteria
+                        bestTHPCA = thre
+                        bestNPCA = n
 
         # Salva le variabili in un dizionario
         BestConfiguration = {"best_criterionPCA": best_criterionPCA, "bestTHPCA": bestTHPCA,

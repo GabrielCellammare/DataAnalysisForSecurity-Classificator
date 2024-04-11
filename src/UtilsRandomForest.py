@@ -97,17 +97,17 @@ def determineRFkFoldConfigurationMutualInfo(ListXTrain, ListYTrain, ListXTest, L
                             if (len(fscores) > 1):
                                 avg_fscore = np.mean(fscores)
                                 print(f"Average F1 score: '{avg_fscore}'")
-                                if avg_fscore > best_fscore:
-                                    best_fscore = avg_fscore
-                                    best_criterion = criteria
-                                    best_TH = thre
-                                    bestN = selectedFeatures
-                                    best_n_tree = n_tree
-                                    best_rand = rand
-                                    best_bootstrap_s = b_size
+                                if avg_fscore == best_fscore:
+                                    if (len(selectedFeatures) < len(bestN)):
+                                        best_fscore = avg_fscore
+                                        best_criterion = criteria
+                                        best_TH = thre
+                                        bestN = selectedFeatures
+                                        best_n_tree = n_tree
+                                        best_rand = rand
+                                        best_bootstrap_s = b_size
 
-                            if avg_fscore == best_fscore:
-                                if (len(selectedFeatures) < len(bestN)):
+                                if avg_fscore > best_fscore:
                                     best_fscore = avg_fscore
                                     best_criterion = criteria
                                     best_TH = thre
@@ -195,17 +195,17 @@ def determineRFkFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, ListYTes
                             if (len(fscores) > 1):
                                 avg_fscore = np.mean(fscores)
                                 print(f"Average F1 score: '{avg_fscore}'")
-                                if avg_fscore > best_fscorePCA:
-                                    best_fscorePCA = avg_fscore
-                                    best_criterionPCA = criteria
-                                    best_THPCA = thre
-                                    bestNPCA = n
-                                    best_n_treePCA = n_tree
-                                    best_randPCA = rand
-                                    best_bootstrap_sPCA = b_size
+                                if avg_fscore == best_fscorePCA:
+                                    if (n < bestNPCA):
+                                        best_fscorePCA = avg_fscore
+                                        best_criterionPCA = criteria
+                                        best_THPCA = thre
+                                        bestNPCA = n
+                                        best_n_treePCA = n_tree
+                                        best_randPCA = rand
+                                        best_bootstrap_sPCA = b_size
 
-                            if avg_fscore == best_fscorePCA:
-                                if (n < bestNPCA):
+                                if avg_fscore > best_fscorePCA:
                                     best_fscorePCA = avg_fscore
                                     best_criterionPCA = criteria
                                     best_THPCA = thre

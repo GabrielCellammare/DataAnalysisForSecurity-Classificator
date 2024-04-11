@@ -22,22 +22,19 @@ def KNNPCA(x, y, script_path, x_test_cleaned, y_test):
     bestTHPCA, bestNPCA, bestEvalPCA, best_KneighborsPCA = determineDecisionTreekFoldConfigurationPCA(
         ListXTrainPCA, ListYTrainPCA, ListXTestPCA, ListYTestPCA, explained_variancePCA, minThresholdPCA, maxThresholdPCA, stepThresholdPCA)
 
-    print('Feature Ranking by MI:', 'Best neighbors', best_KneighborsPCA,
+    print('Feature Ranking by PCA on KNN:', 'Best neighbors', best_KneighborsPCA,
 
-          'best MI threshold', bestTHPCA, 'best N', bestNPCA, 'Best CV F', bestEvalPCA)
+          'best PCA threshold', bestTHPCA, 'best N', bestNPCA, 'Best CV F', bestEvalPCA)
 
     KNNPCA = knnLearner(
-        XPCA.iloc[:, 1:(
-            bestNPCA+1)], y, best_KneighborsPCA)
+        XPCA.iloc[:, :bestNPCA], y, best_KneighborsPCA)
 
     X_TestPCA = applyPCA(x_test_cleaned, pcaObj, pcalist)
 
-    x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, 1:(
-        bestNPCA+1)]
+    x_TestPCA_cleaned_feature = X_TestPCA.iloc[:, :bestNPCA]
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
-        x.iloc[:, 1:(
-            bestNPCA+1)].shape}'\n")
+        x.iloc[:, :bestNPCA].shape}'", "\n")
     print(f"Data Test: Nuova lista di attributi con dimensione: '{
         x_TestPCA_cleaned_feature.shape}'\n")
 

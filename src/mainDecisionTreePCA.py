@@ -23,9 +23,9 @@ def DecisionTreePCA(x, y, script_path, x_test_cleaned, y_test):
     bestCriterionPCA, bestTHPCA, bestNPCA, bestEvalPCA = determineDecisionTreekFoldConfigurationPCA(
         ListXTrainPCA, ListYTrainPCA, ListXTestPCA, ListYTestPCA, explained_variancePCA, minThresholdPCA, maxThresholdPCA, stepThresholdPCA)
 
-    print('Feature Ranking by PCA:', 'Best criterion', bestCriterionPCA,
+    print('Feature Ranking by PCA:', "\n", 'Best criterion = ', bestCriterionPCA, "\n",
 
-          'best PCA threshold', bestTHPCA, 'best N', bestNPCA, 'Best CV F', bestEvalPCA)
+          'best PCA threshold = ', bestTHPCA, "\n", 'best N = ', bestNPCA, "\n", 'Best CV F = ', bestEvalPCA)
 
     DTPCA = decisionTreeLearner(
         XPCA.iloc[:,

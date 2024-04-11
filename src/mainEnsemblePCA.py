@@ -22,9 +22,9 @@ def EnsemblePCA(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, clf3):
     bestTHPCA, bestNPCA, bestEvalPCA = determineEnsamblekFoldConfigurationPCA(
         ListXTrainPCA, ListYTrainPCA, ListXTestPCA, ListYTestPCA, explained_variancePCA, minThresholdPCA, maxThresholdPCA, stepThresholdPCA, clf1, clf2, clf3)
 
-    print('Feature Ranking by MI:',
+    print('Feature Ranking by PCA on Ensemble:',
 
-          'best MI threshold', bestTHPCA, 'best N', bestNPCA, 'Best CV F', bestEvalPCA)
+          'best PCA threshold', bestTHPCA, 'best N', bestNPCA, 'Best CV F', bestEvalPCA)
 
     ECLFPCA = EnsambleLearner(
         XPCA.iloc[:, :bestNPCA], y, clf1, clf2, clf3)

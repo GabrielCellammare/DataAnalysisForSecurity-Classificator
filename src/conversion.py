@@ -2,7 +2,7 @@ from pathlib import Path
 import pickle
 
 """
-Il seguente file è stato realizzato per trasformare, i file oggetto serializzati in file di testo. 
+Il seguente file è stato realizzato per trasformare, i file oggetto serializzati in file di testo.
 """
 
 # Variabile che prende il valore del path in cui si trova il file
@@ -10,10 +10,10 @@ script_path = Path(__file__)
 
 # Crea il percorso completo al file utilizzando pathlib
 data_read = script_path.parent.parent / "Serialized" / \
-    "BestConfigurationMutualInfoPCADecisionTree.pkl"
+    "BestConfigurationMutualInfoEnsemble.pkl"
 
 data_write = script_path.parent.parent / "BestConfiguration" / \
-    "BestConfigurationMutualInfoPCADecisionTree.txt"
+    "BestConfigurationMutualInfoEnsemble.txt"
 
 # Carica i dati serializzati dal file pickle
 with open(data_read, 'rb') as file:

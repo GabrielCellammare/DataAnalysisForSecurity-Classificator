@@ -21,21 +21,19 @@ def EnsembleMutualInfo(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, cl
         with open(serialize_dir, "wb") as f:
             pickle.dump(MutualInfoTraining, f)
         boxPlotDirMutualInfo = script_path.parent.parent / "BoxPlotMutualInfo"
-        BoxPlotAnalysisDataMutualInfo(
-            x, y, boxPlotDirMutualInfo, rank)
+        if (not os.listdir(boxPlotDirMutualInfo)):
+            BoxPlotAnalysisDataMutualInfo(
+                x, y, boxPlotDirMutualInfo, rank, 10)
 
     minThreshold = 0
     maxMutualInfo = 0.0
-
     for key in rank:
         if (key[1] >= maxMutualInfo):
             maxMutualInfo = key[1]
-
     # print(f"Max mutual info = '{maxMutualInfo}'")
-
-    stepThreshold = 0.05
-
+    stepThreshold = 0.02
     maxThreshold = maxMutualInfo+stepThreshold
+
     folds = 5
     ListXTrain, ListXTest, ListYTrain, ListYTest = stratifiedKFold(
         x, y, folds)
@@ -54,7 +52,7 @@ def EnsembleMutualInfo(x, y, script_path, x_test_cleaned, y_test, clf1, clf2, cl
     bestTH, bestN, bestEval = determineEnsamblekFoldConfigurationMutualInfo(
         ListXTrain, ListYTrain, ListXTest, ListYTest, rank, minThreshold, maxThreshold, stepThreshold, clf1, clf2, clf3)
 
-    print('Feature Ranking by MI:\n',
+    print('Feature Ranking by MI on Ensemble:\n',
           'best MI threshold = ', bestTH, "\n", 'best N = ', bestN, "\n", 'Best CV F = ', bestEval)
 
     # Prendo le feature migliori (Mutual info)

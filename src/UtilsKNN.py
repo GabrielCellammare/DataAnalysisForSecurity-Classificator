@@ -66,14 +66,14 @@ def determineKNNkFoldConfigurationMutualInfo(ListXTrain, ListYTrain, ListXTest, 
                 if (len(fscores) > 1):
                     avg_fscore = np.mean(fscores)
                     print(f"Average F1 score: '{avg_fscore}'")
-                    if avg_fscore > best_fscore:
-                        best_fscore = avg_fscore
-                        best_TH = thre
-                        bestN = selectedFeatures
-                        best_Kneighbors = neighbor
+                    if avg_fscore == best_fscore:
+                        if (len(selectedFeatures) < len(bestN)):  # ??
+                            best_fscore = avg_fscore
+                            best_TH = thre
+                            bestN = selectedFeatures
+                            best_Kneighbors = neighbor
 
-                if avg_fscore == best_fscore:
-                    if (len(selectedFeatures) < len(bestN)):  # ??
+                    if avg_fscore > best_fscore:
                         best_fscore = avg_fscore
                         best_TH = thre
                         bestN = selectedFeatures
@@ -131,10 +131,8 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
                     # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
                     for i in range(len(ListXTrain)):
                         # indicizzazione di tipo :n in Python seleziona gli elementi dall’indice 0 all’indice n-1
-                        x_train_feature_selected = ListXTrain[i].iloc[:, 1:(
-                            n+1)]
-                        x_test = ListXTest[i].iloc[:, 1:(
-                            n+1)]
+                        x_train_feature_selected = ListXTrain[i].iloc[:, :n]
+                        x_test = ListXTest[i].iloc[:, :n]
                         knn = knnLearner(
                             x_train_feature_selected, ListYTrain[i], neighbor)
 
@@ -144,11 +142,6 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
                 if (len(fscores) > 1):
                     avg_fscore = np.mean(fscores)
                     print(f"Average F1 score: '{avg_fscore}'")
-                    if avg_fscore > bestEvalPCA:
-                        bestEvalPCA = avg_fscore
-                        bestTHPCA = thre
-                        bestNPCA = n
-                        best_KneighborsPCA = neighbor
 
                     if avg_fscore == bestEvalPCA:
                         if (n < bestNPCA):
@@ -156,6 +149,12 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
                             bestTHPCA = thre
                             bestNPCA = n
                             best_KneighborsPCA = neighbor
+
+                    if avg_fscore > bestEvalPCA:
+                        bestEvalPCA = avg_fscore
+                        bestTHPCA = thre
+                        bestNPCA = n
+                        best_KneighborsPCA = neighbor
 
         # Salva le variabili in un dizionario
         BestConfiguration = {"bestTHPCA": bestTHPCA,
