@@ -1,0 +1,8 @@
+                     precision    recall  f1-score   support
+
+class 0 - GoodWare        0.93      0.95      0.94      1503
+  class 1 - Malware       0.95      0.92      0.94      1497
+
+           accuracy                           0.94      3000
+          macro avg       0.94      0.94      0.94      3000
+       weighted avg       0.94      0.94      0.94      3000

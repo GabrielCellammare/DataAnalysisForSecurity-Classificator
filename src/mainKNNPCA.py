@@ -1,6 +1,6 @@
 from UtilsFunctions import *
 from sklearn.metrics import classification_report
-from UtilsKNN import determineDecisionTreekFoldConfigurationPCA, knnLearner
+from UtilsKNN import determineKNNkFoldConfigurationPCA, knnLearner
 
 # adopt the stratified CV to determine the best decision tree configuration on the pcs
 
@@ -19,7 +19,7 @@ def KNNPCA(x, y, script_path, x_test_cleaned, y_test):
     ListXTrainPCA, ListXTestPCA, ListYTrainPCA, ListYTestPCA = stratifiedKFold(
         XPCA, y, folds)
 
-    bestTHPCA, bestNPCA, bestEvalPCA, best_KneighborsPCA = determineDecisionTreekFoldConfigurationPCA(
+    bestTHPCA, bestNPCA, bestEvalPCA, best_KneighborsPCA = determineKNNkFoldConfigurationPCA(
         ListXTrainPCA, ListYTrainPCA, ListXTestPCA, ListYTestPCA, explained_variancePCA, minThresholdPCA, maxThresholdPCA, stepThresholdPCA)
 
     print('Feature Ranking by PCA on KNN:', 'Best neighbors', best_KneighborsPCA,

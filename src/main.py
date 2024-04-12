@@ -1,9 +1,13 @@
-from UtilsFunctions import loadData, removeColumnsWithMinMaxEqual, removeColumnsWithMinMaxEqualTest, stratifiedKFold
+from UtilsFunctions import loadData, removeColumnsWithMinMaxEqual, removeColumnsWithMinMaxEqualTest
+from mainDecisionTreeMIPCA import DecisionTreeMIPCA
 from mainDescribeData import DescribeData
 from mainDecisionTreeMutualInfo import DecisionTreeMutualInfo
 from mainDecisionTreePCA import DecisionTreePCA
+from mainEnsembleMIPCA import EnsembleMIPCA
 from mainEnsembleMutualInfo import EnsembleMutualInfo
 from mainEnsemblePCA import EnsemblePCA
+from mainKNNMIPCA import KNNMIPCA
+from mainRandomForestMIPCA import RandomForestMIPCA
 from mainRandomForestMutualInfo import RandomForestMutualInfo
 from mainRandomForestPCA import RandomForestPCA
 from mainKNNMutualInfo import KNNMutualInfo
@@ -41,7 +45,6 @@ x_boxPlotcleanedTrain, removed_columnsMaxMinBoxPlot = removeColumnsWithMinMaxEqu
 
 # Descrizione dati Training
 DescribeData(x_boxPlotcleanedTrain, y_train, script_path)
-
 
 # Inizializzo test
 data_dir = script_path.parent.parent / "Data"
@@ -91,3 +94,15 @@ clf3KNNPCA = KNNPCA(x_cleanedTrain, y_train,
 
 eclfPCA = EnsemblePCA(x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test,
                       clf1DecisionTreePCA, clf2RandomForestPCA, clf3KNNPCA)
+
+# In questo caso è stata eseguita prima una rifinitura con Mutual info e poi con PCA
+
+clfDecisionTreeMixed = DecisionTreeMIPCA(x_cleanedTrain, y_train,
+                                         script_path, x_cleanedTest, y_test)
+clfRandomForestMixed = RandomForestMIPCA(x_cleanedTrain, y_train,
+                                         script_path, x_cleanedTest, y_test)
+clfKNNMixed = KNNMIPCA(x_cleanedTrain, y_train,
+                       script_path, x_cleanedTest, y_test)
+
+clfEnsebmleMixed = EnsembleMIPCA(x_cleanedTrain, y_train, script_path, x_cleanedTest, y_test,
+                                 clfDecisionTreeMixed, clfRandomForestMixed, clfKNNMixed)

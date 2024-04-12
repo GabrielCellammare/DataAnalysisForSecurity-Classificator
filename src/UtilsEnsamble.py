@@ -155,3 +155,74 @@ def determineEnsamblekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest, Li
         print("\nCompleted!\n")
 
         return bestTHPCA, bestNPCA, bestEvalPCA
+
+
+def determineEnsamblekFoldConfigurationMIPCA(ListXTrain, ListYTrain, ListXTest, ListYTest, explained_variance, min_t, max_t, step, clf1, clf2, clf3):
+
+    print("\nComputing best configuration with Mutual Info and PCA on Ensemble with Decision Tree, Random Forest and KNN...\n")
+
+    script_path = Path(__file__)
+
+    # Crea il percorso completo al file utilizzando pathlib
+    serialize_dir = script_path.parent.parent / \
+        "Serialized" / "BestConfigurationMIPCAEnsemble.pkl"
+
+    # Verifica se il file esiste
+    if os.path.exists(serialize_dir):
+        # Se il file esiste, leggi i parametri
+        with open(serialize_dir, "rb") as f:
+            bestConfiguration = pickle.load(f)
+
+        bestTHPCA = bestConfiguration["bestTHPCA"]
+        bestNPCA = bestConfiguration["bestNPCA"]
+        bestEvalPCA = bestConfiguration["bestEvalPCA"]
+
+        print("\nCompleted!\n")
+        return bestTHPCA, bestNPCA, bestEvalPCA
+
+    else:
+        bestTHPCA = None
+        bestNPCA = None
+        bestEvalPCA = 0
+
+        for thre in np.arange(min_t, max_t, step):
+            avg_fscore = 0
+            fscores = []
+            n = NumberOfTopPCSelect(explained_variance, thre)
+            if (n > 0):
+                # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
+                for i in range(len(ListXTrain)):
+                    # indicizzazione di tipo :n in Python seleziona gli elementi dall’indice 0 all’indice n-1
+                    x_train_feature_selected = ListXTrain[i].iloc[:, :n]
+                    x_test = ListXTest[i].iloc[:, :n]
+                    eclf = EnsambleLearner(
+                        x_train_feature_selected, ListYTrain[i], clf1, clf2, clf3)
+
+                    y_pred = eclf.predict(x_test)
+                    fscores.append(f1_score(ListYTest[i], y_pred))
+
+            if (len(fscores) > 1):
+                avg_fscore = np.mean(fscores)
+                print(f"Average F1 score: '{avg_fscore}'")
+
+                if avg_fscore == bestEvalPCA:
+                    if (n < bestNPCA):
+                        bestEvalPCA = avg_fscore
+                        bestTHPCA = thre
+                        bestNPCA = n
+
+                if avg_fscore > bestEvalPCA:
+                    bestEvalPCA = avg_fscore
+                    bestTHPCA = thre
+                    bestNPCA = n
+
+        # Salva le variabili in un dizionario
+        BestConfiguration = {"bestTHPCA": bestTHPCA,
+                             "bestNPCA": bestNPCA, "bestEvalPCA": bestEvalPCA}
+
+        # Salva il dizionario in un file usando pickle
+        with open(serialize_dir, "wb") as f:
+            pickle.dump(BestConfiguration, f)
+        print("\nCompleted!\n")
+
+        return bestTHPCA, bestNPCA, bestEvalPCA

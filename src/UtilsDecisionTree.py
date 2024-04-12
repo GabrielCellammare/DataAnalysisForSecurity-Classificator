@@ -207,3 +207,85 @@ def determineDecisionTreekFoldConfigurationPCA(ListXTrain, ListYTrain, ListXTest
         print("\nCompleted!\n")
 
         return best_criterionPCA, bestTHPCA, bestNPCA, bestEvalPCA
+
+
+def determineDecisionTreekFoldConfigurationMIPCA(ListXTrain, ListYTrain, ListXTest, ListYTest, explained_variance, min_t, max_t, step):
+
+    print("\nComputing best configuration with Mutual Info and PCA on Decision Tree...\n")
+
+    script_path = Path(__file__)
+
+    # Crea il percorso completo al file utilizzando pathlib
+    serialize_dir = script_path.parent.parent / \
+        "Serialized" / "BestConfigurationMIPCADecisionTree.pkl"
+
+    # Verifica se il file esiste
+    if os.path.exists(serialize_dir):
+        # Se il file esiste, leggi i parametri
+        with open(serialize_dir, "rb") as f:
+            bestConfiguration = pickle.load(f)
+
+        best_criterionPCA = bestConfiguration["best_criterionPCA"]
+        bestTHPCA = bestConfiguration["bestTHPCA"]
+        bestNPCA = bestConfiguration["bestNPCA"]
+        bestEvalPCA = bestConfiguration["bestEvalPCA"]
+
+        print("\nCompleted!\n")
+        return best_criterionPCA, bestTHPCA, bestNPCA, bestEvalPCA
+
+    else:
+        best_criterionPCA = None
+        bestTHPCA = None
+        bestNPCA = None
+        bestEvalPCA = 0
+
+        criterion = ['gini', 'entropy']
+
+        for criteria in criterion:
+            for thre in np.arange(min_t, max_t, step):
+                avg_fscore = 0
+                fscores = []
+                n = NumberOfTopPCSelect(explained_variance, thre)
+                if (n > 0):
+                    # Utilizzo la lunghezza di ListXTrain poichè è la stessa di ListXTest
+                    for i in range(len(ListXTrain)):
+                        # indicizzazione di tipo :n in Python seleziona gli elementi dall’indice 0 all’indice n-1
+                        x_train_feature_selected = ListXTrain[i].iloc[:, :n]
+                        x_test = ListXTest[i].iloc[:, :n]
+                        """
+                        x_test = ListXTest[i].iloc[:, 1:(
+                            n+1)]
+                        """
+                        clf = decisionTreeLearner(
+                            x_train_feature_selected, ListYTrain[i], criteria)
+
+                        y_pred = clf.predict(x_test)
+                        fscores.append(f1_score(ListYTest[i], y_pred))
+
+                if (len(fscores) > 1):
+                    avg_fscore = np.mean(fscores)
+                    print(f"Average F1 score: '{avg_fscore}'")
+
+                    if avg_fscore == bestEvalPCA:
+                        if (n < bestNPCA):
+                            bestEvalPCA = avg_fscore
+                            best_criterionPCA = criteria
+                            bestTHPCA = thre
+                            bestNPCA = n
+
+                    if avg_fscore > bestEvalPCA:
+                        bestEvalPCA = avg_fscore
+                        best_criterionPCA = criteria
+                        bestTHPCA = thre
+                        bestNPCA = n
+
+        # Salva le variabili in un dizionario
+        BestConfiguration = {"best_criterionPCA": best_criterionPCA, "bestTHPCA": bestTHPCA,
+                             "bestNPCA": bestNPCA, "bestEvalPCA": bestEvalPCA, }
+
+        # Salva il dizionario in un file usando pickle
+        with open(serialize_dir, "wb") as f:
+            pickle.dump(BestConfiguration, f)
+        print("\nCompleted!\n")
+
+        return best_criterionPCA, bestTHPCA, bestNPCA, bestEvalPCA

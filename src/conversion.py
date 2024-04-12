@@ -10,10 +10,10 @@ script_path = Path(__file__)
 
 # Crea il percorso completo al file utilizzando pathlib
 data_read = script_path.parent.parent / "Serialized" / \
-    "BestConfigurationMutualInfoEnsemble.pkl"
+    "BestConfigurationPCAKNN.pkl"
 
 data_write = script_path.parent.parent / "BestConfiguration" / \
-    "BestConfigurationMutualInfoEnsemble.txt"
+    "BestConfigurationPCAKNN.txt"
 
 # Carica i dati serializzati dal file pickle
 with open(data_read, 'rb') as file:
