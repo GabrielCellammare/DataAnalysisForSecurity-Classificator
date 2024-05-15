@@ -6,7 +6,6 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import numpy as np
 
 
 """Funzione che legge il file csv e restituisce un dataframe"""
@@ -34,7 +33,7 @@ def preElaborationData(x):
         col_data = x[col]
         col_description = col_data.describe()
         print(f"Statistiche della colonna '{
-              col}': \n{col_description}")
+            col}': \n{col_description}")
         print("\n")
 
 
@@ -110,7 +109,7 @@ def plotHistogram(labelCount, y):
 
     plt.bar(percentuale.index, percentuale)
     plt.ylabel('Percentuale (%)')
-    plt.title('Distribuzione dei valori nella classi"')
+    plt.title('Distribuzione dei valori nella classi')
 
     # Aggiungi le etichette delle percentuali sopra le barre
     for index, value in enumerate(percentuale):
@@ -129,12 +128,6 @@ Funzione che salva il box plot di ogni variabile indipendente rispetto alle clas
 def BoxPlotPreAnalysisData(x, y, boxPlotDir):
     print("\nSaving Box Plot in 'BoxPlot' Folder...\n")
     # Ottieni la lista dei file nella cartella
-    elenco_file = os.listdir(boxPlotDir)
-
-    # Itera attraverso la lista dei file e rimuove i file
-    for file in elenco_file:
-        percorso_completo = os.path.join(boxPlotDir, file)
-        os.remove(percorso_completo)
 
     x['Label'] = y['Label']
 
@@ -304,7 +297,8 @@ def stratifiedKFold(X, Y, folds=5):
     ListYTrain = []
     ListYTest = []
     for i, (train_index, test_index) in enumerate(skf.split(X, Y)):
-
+        print(train_index)
+        print("Test: ", test_index, "\n")
         ListXTrain.append(pd.DataFrame(X, index=train_index))
         ListYTrain.append(pd.DataFrame(Y, index=train_index))
         ListXTest.append(pd.DataFrame(X, index=test_index))

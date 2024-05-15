@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.metrics import f1_score
 import pickle
 from pathlib import Path
-from UtilsFunctions import applyPCA, pca, topFeatureSelect, NumberOfTopPCSelect
+from UtilsFunctions import topFeatureSelect, NumberOfTopPCSelect
 
 seed = 42
 np.random.seed(seed)
@@ -22,11 +22,9 @@ def decisionTreeLearner(X, Y, c):
     clf.min_samples_split = 500  # Numero minimo di esempi per mettere uno split
     # Tree_ dentro c'è l'albero addestrata
     clf.fit(X, Y)
-
     # print(f"Number of nodes: {clf.tree_.node_count}")
     # print(f"Number of leaves: {clf.get_n_leaves()} ")
     # Return the number of leaves of the decision tree.)
-
     return clf
 
 

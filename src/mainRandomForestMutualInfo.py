@@ -57,7 +57,8 @@ def RandomForestMutualInfo(x, y, script_path, x_test_cleaned, y_test):
 
     print('Feature Ranking by MI on Random Forest:\n',
           'Best criterion = ', best_criterion, "\n"
-          'best MI threshold = ', best_TH, "\n", 'best N = ', bestN, "\n", 'Best CV F = ', best_fscore,
+          'best MI threshold = ', best_TH, "\n", 'best N = ',
+          bestN, "\n", 'Best CV F = ', best_fscore,
           "\n"'best number of tree = ', best_n_tree, "\n",
           "\n"'best rand (Max Features) = ', best_rand, "\n",
           "\n"'best bootstrap size = ', best_bootstrap_s, "\n")
