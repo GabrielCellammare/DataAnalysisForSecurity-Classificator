@@ -1,4 +1,5 @@
 import pickle
+import time
 from UtilsFunctions import *
 from sklearn.metrics import classification_report
 from UtilsRandomForest import determineRFkFoldConfigurationMIPCA, randomForestLearner
@@ -68,8 +69,13 @@ def RandomForestMIPCA(x, y, script_path, x_test_cleaned, y_test):
           "\nbestNMIPCA: ", bestNPCA, "\nbest_fscoreMIPCA: ", best_fscorePCA, "\nbest_n_treeMIPCA: ", best_n_treePCA,
           "\nbest_randMIPCA: ", best_randPCA, "\nbest_bootstrap_sMIPCA: ", best_bootstrap_sPCA)
 
+    start_time = time.time()
     RFPCA = randomForestLearner(
         XPCA.iloc[:, :bestNPCA], y, best_n_treePCA, best_criterionPCA, best_randPCA, best_bootstrap_sPCA)
+    end_time = time.time()
+    execution_time = end_time - start_time
+    # Stampa del tempo di esecuzione
+    print(f"Il tempo di esecuzione è: {execution_time} secondi")
 
     X_TestPCA = applyPCA(x_test_cleaned_new, pcaObj, pcalist)
 

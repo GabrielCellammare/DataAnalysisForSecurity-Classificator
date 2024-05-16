@@ -1,3 +1,4 @@
+import time
 from UtilsFunctions import *
 from sklearn.metrics import classification_report
 from UtilsRandomForest import randomForestLearner, determineRFkFoldConfigurationMutualInfo
@@ -66,9 +67,14 @@ def RandomForestMutualInfo(x, y, script_path, x_test_cleaned, y_test):
     # Prendo le feature migliori (Mutual info)
     toplist = topFeatureSelect(rank, best_TH)
 
+    start_time = time.time()
     RF = randomForestLearner(
         x.loc[:, toplist], y, best_n_tree, best_criterion, best_rand, best_bootstrap_s)
+    end_time = time.time()
+    execution_time = end_time - start_time
 
+    # Stampa del tempo di esecuzione
+    print(f"Il tempo di esecuzione è: {execution_time} secondi")
     x_test_cleaned_feature = x_test_cleaned.loc[:, toplist]
 
     print(f"Data Training: Nuova lista di attributi con dimensione: '{
