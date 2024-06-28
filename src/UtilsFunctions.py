@@ -189,7 +189,6 @@ def BoxPlotAnalysisDataMutualInfo(x, y, boxPlotDir, mutualInfo, n_print=10):
             x['Label'] = y['Label']
             for tupla in mutualInfo:
                 for col in x.columns:
-                    # capire se va 0 considerato o meno
                     if (tupla[0] == col and tupla[1] != 0):
                         if (i < n_print):
                             x.boxplot(column=col, by='Label')
